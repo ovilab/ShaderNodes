@@ -1,0 +1,8 @@
+<RCC>
+    <qresource prefix="/">
+        <file>main.qml</file>
+        <file>PreviewScene.qml</file>
+        <file>Editor.qml</file>
+        <file>Node.qml</file>
+    </qresource>
+</RCC>
