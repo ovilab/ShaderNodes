@@ -4,5 +4,6 @@
         <file>PreviewScene.qml</file>
         <file>Editor.qml</file>
         <file>Node.qml</file>
+        <file>Edge.qml</file>
     </qresource>
 </RCC>
