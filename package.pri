@@ -20,3 +20,6 @@ SOURCES += \
 
 RESOURCES += \
     $$PWD/src/imports/shadernodes_imports.qrc
+
+DISTFILES += \
+    $$PWD/src/HandleArray.qml

@@ -1,7 +1,9 @@
-import SimVis 1.0
+import ShaderNodes 1.0
 
 ShaderNode {
-    property var value
+    property var value: 0.0
+
+    exportedTypeName: "Sine"
 
     name: "sine"
 

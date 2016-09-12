@@ -1,6 +1,5 @@
-import SimVis 1.0
-import SimVis.ShaderNodes 1.0
-import SimVis.ShaderNodes 1.0 as Nodes
+import ShaderNodes 1.0
+import ShaderNodes 1.0 as Nodes
 
 import Qt3D.Core 2.0
 import Qt3D.Render 2.0
@@ -42,7 +41,7 @@ ShaderBuilder {
         result: "texCoord"
     }
     
-    sourceFile: "qrc:/SimVis/ShaderNodes/shaders/" + version + "/shader_builder_material.frag"
+    sourceFile: "qrc:/ShaderNodes/shaders/" + version + "/shader_builder_material.frag"
     
     outputs: [
         ShaderOutput {

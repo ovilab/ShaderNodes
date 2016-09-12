@@ -11,6 +11,8 @@
 #include <QQmlFile>
 #include <QFile>
 
+const QStringList builtinNames = QStringList{"objectName","parent","enabled","name","type","result","source","header","identifier","headerFile","requirement","dependencies","data","childNodes","exportedTypeName","arrayProperties"};
+
 ShaderNode::ShaderNode(Qt3DCore::QNode *parent)
     : Qt3DCore::QNode(parent)
 {
@@ -86,19 +88,53 @@ void ShaderNode::handlePropertyChange(int index)
     }
 }
 
+QString ShaderNode::createUniform(const QString &propertyName, const QVariant &value)
+{
+    QByteArray propertyNameArray = propertyName.toUtf8();
+    int propertyIndex = metaObject()->indexOfProperty(propertyNameArray.constData());
+    if(propertyIndex < 0) {
+        qWarning() << "WARNING: ShaderNode::setup(): Could not find shader node or property for "
+                   << propertyName << "on" << name();
+        return QString("");
+    }
+    QMetaProperty metaProperty = metaObject()->property(propertyIndex);
+
+    QString propertyNameNoUnderscores = QString(propertyName).replace("_", "");
+    QString uniformPrefix = "uniform";
+    switch(shaderBuilder()->shaderType()) {
+    case ShaderBuilder::ShaderType::Fragment:
+        uniformPrefix = "fragment_uniform";
+        break;
+    case ShaderBuilder::ShaderType::Geometry:
+        uniformPrefix = "geometry_uniform";
+        break;
+    case ShaderBuilder::ShaderType::Vertex:
+        uniformPrefix = "vertex_uniform";
+        break;
+    default:
+        break;
+    }
+
+    QString targetIdentifier =  uniformPrefix + "_" + propertyNameNoUnderscores + "_" + ShaderUtils::generateName();
+    shaderBuilder()->addUniform(this, propertyName, targetIdentifier, value, metaProperty);
+
+    return targetIdentifier;
+}
+
 bool ShaderNode::setup(ShaderBuilder* shaderBuilder, QString tempIdentifier)
 {
+    setShaderBuilder(shaderBuilder);
+
     if(m_hasSetup && tempIdentifier.isEmpty()) {
         return true;
     }
     if(!m_requirement) {
-        qWarning() << "ERROR: ShaderNode::setup(): Requirement for" << this << name() << "is not satisfied.";
+        qWarning() << "WARNING: ShaderNode::setup(): Requirement for" << this << name() << "is not satisfied.";
         return false;
     }
     if(m_type.isEmpty()) {
-        qWarning() << "ERROR: ShaderNode::setup(): " << name() << "is missing type.";
-        // TODO add this back, but it can sometimes be called too soon
-//        return false;
+        qWarning() << "WARNING: ShaderNode::setup(): " << name() << "is missing type.";
+        return false;
     }
     QString currentIdentifier;
     if(tempIdentifier.isEmpty()) {
@@ -213,6 +249,43 @@ bool ShaderNode::setup(ShaderBuilder* shaderBuilder, QString tempIdentifier)
             }
             QVariant value = mappings[propertyName];
 
+            if(value.canConvert(QVariant::List)) {
+                int i = 0;
+                QVariantList list = value.toList();
+                if(list.count() < 1) {
+                    continue;
+                }
+                for(const QVariant& listValue : list) {
+                    QString targetIdentifier;
+                    QString sourceType;
+                    if(ShaderNode *node = qvariant_cast<ShaderNode*>(listValue)) {
+                        success = success && node->setup(shaderBuilder);
+                        if(!m_resolvedDependencies.contains(node)) {
+                            m_resolvedDependencies.append(node);
+                        }
+                        targetIdentifier = node->identifier();
+                        sourceType = node->type();
+                    } else {
+                        targetIdentifier = createUniform(propertyName, listValue);
+                        sourceType = glslType(listValue);
+                    }
+                    // replaces '$property' or '$(property, type)'
+                    QRegularExpression indexedRegex("\\$(\\(\\s*)?" + propertyName + "\\b\\[" + QString::number(i) +"\\](\\s*,\\s*[_a-zA-Z0-9]+\\s*\\))?");
+                    sourceContent.replace(indexedRegex, ShaderUtils::convert(sourceType, targetType, targetIdentifier));
+
+                    // Replace any singular occurences with first item
+                    if(i == 0) {
+                        QRegularExpression namedTargetRegex("\\$(\\(\\s*)?" + propertyName + "(?![\\w\\W\\[])(\\s*,\\s*" + targetType + "\\s*\\))?");
+                        sourceContent.replace(namedTargetRegex, ShaderUtils::convert(sourceType, targetType, targetIdentifier));
+                    }
+
+                    i += 1;
+                }
+
+                alreadyReplaced.append(propertyName);
+                continue;
+            }
+
             QString typeName = value.typeName();
             if(typeName.startsWith("QQmlListProperty")) {
                 QQmlListProperty<QObject> *list = static_cast<QQmlListProperty<QObject>*>(value.data());
@@ -234,6 +307,7 @@ bool ShaderNode::setup(ShaderBuilder* shaderBuilder, QString tempIdentifier)
                     QRegularExpression indexedRegex("\\$(\\(\\s*)?" + propertyName + "\\b\\[" + QString::number(i) +"\\](\\s*,\\s*[_a-zA-Z0-9]+\\s*\\))?");
                     sourceContent.replace(indexedRegex, ShaderUtils::convert(sourceType, targetType, targetIdentifier));
                 }
+                alreadyReplaced.append(propertyName);
                 continue;
             }
 
@@ -249,43 +323,20 @@ bool ShaderNode::setup(ShaderBuilder* shaderBuilder, QString tempIdentifier)
                 targetIdentifier = node->identifier();
                 sourceType = node->type();
             } else {
-                // make a uniform
-                QByteArray propertyNameArray = propertyName.toUtf8();
-                int propertyIndex = metaObject()->indexOfProperty(propertyNameArray.constData());                
-                if(propertyIndex < 0) {
-                    qWarning() << "WARNING: ShaderNode::setup(): Could not find shader node or property for "
-                               << propertyName << "on" << name();
-                    continue;
-                }
-                QMetaProperty metaProperty = metaObject()->property(propertyIndex);
-
-                QString uniformPrefix = "uniform";
-                switch(shaderBuilder->shaderType()) {
-                case ShaderBuilder::ShaderType::Fragment:
-                    uniformPrefix = "fragment_uniform";
-                    break;
-                case ShaderBuilder::ShaderType::Geometry:
-                    uniformPrefix = "geometry_uniform";
-                    break;
-                case ShaderBuilder::ShaderType::Vertex:
-                    uniformPrefix = "vertex_uniform";
-                    break;
-                default:
-                    break;
-                }
-
-                targetIdentifier = uniformPrefix + "_" + propertyNameNoUnderscores + "_" + ShaderUtils::generateName();
+                targetIdentifier = createUniform(propertyName, value);
                 sourceType = glslType(value);
-                shaderBuilder->addUniform(this, propertyName, targetIdentifier, value, metaProperty);
+            }
+            if(targetIdentifier.isEmpty()) {
+                continue;
             }
             // replaces '$property' or '$(property, type)'
             QRegularExpression namedTargetRegex("\\$(\\(\\s*)?" + propertyName + "\\b(\\s*,\\s*" + targetType + "\\s*\\))?");
             sourceContent.replace(namedTargetRegex, ShaderUtils::convert(sourceType, targetType, targetIdentifier));
+
             alreadyReplaced.append(propertyName);
         }
     }
 
-    setShaderBuilder(shaderBuilder);
     if(!tempIdentifier.isEmpty()) {
         m_hasSetup = true;
     }
@@ -344,6 +395,7 @@ void ShaderNode::setType(QString type)
         return;
 
     m_type = type;
+
     emit typeChanged(type);
 }
 
@@ -397,6 +449,15 @@ void ShaderNode::setHeaderFile(QUrl headerFile)
     emit headerFileChanged(headerFile);
 }
 
+void ShaderNode::setExportedTypeName(QString exportedTypeName)
+{
+    if (m_exportedTypeName == exportedTypeName)
+        return;
+
+    m_exportedTypeName = exportedTypeName;
+    emit exportedTypeNameChanged(exportedTypeName);
+}
+
 ShaderBuilder *ShaderNode::shaderBuilder() const
 {
     return m_shaderBuilder;
@@ -435,6 +496,22 @@ QString ShaderNode::glslType(QVariant value) const
 QString ShaderNode::preferredType(QVariant value1, QVariant value2) const
 {
     return ShaderUtils::preferredType(value1, value2);
+}
+
+QStringList ShaderNode::inputNames() const
+{
+    QStringList names;
+    for(int i = 0; i < metaObject()->propertyCount(); i++) {
+        QString name = metaObject()->property(i).name();
+        if(builtinNames.contains(name)) {
+            continue;
+        }
+        if(name.length() > 0 && name.at(0) == QChar('_')) {
+            continue;
+        }
+        names.append(name);
+    }
+    return names;
 }
 
 QString ShaderNode::source() const
@@ -480,4 +557,9 @@ void ShaderNode::removeDependency(ShaderNode *dependency)
 void ShaderNode::clearDependencies()
 {
     m_declaredDependencies.clear();
+}
+
+QString ShaderNode::exportedTypeName() const
+{
+    return m_exportedTypeName;
 }

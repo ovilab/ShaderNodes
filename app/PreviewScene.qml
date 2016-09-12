@@ -6,10 +6,14 @@ import Qt3D.Input 2.0
 import Qt3D.Logic 2.0
 import Qt3D.Render 2.0
 
+import ShaderNodes 1.0
+
 Scene3D {
     id: root
 
-    aspects: ["core", "input", "logic"]
+    property alias material: material
+
+    aspects: ["input", "logic"]
 
     Entity {
         id: rootEntity
@@ -23,10 +27,11 @@ Scene3D {
                         aspectRatio: root.width / root.height
                         nearPlane: 1.0
                         farPlane: 10000.0
-                        position: Qt.vector3d(0, 0, 20)
+                        position: Qt.vector3d(20, 10, 20)
                         viewCenter: Qt.vector3d(0, 0, 0)
                         upVector: Qt.vector3d(0.0, 1.0, 0.0)
                     }
+                    clearColor: Qt.rgba(0.2, 0.2, 0.2)
                 }
             },
             InputSettings {}
@@ -34,9 +39,16 @@ Scene3D {
 
         Entity {
             components: [
-                SphereMesh {},
-                PhongMaterial {}
+                sphereMesh,
+                material
             ]
+
+            SphereMesh {
+                id: sphereMesh
+            }
+            ShaderBuilderMaterial {
+                id: material
+            }
         }
     }
 }

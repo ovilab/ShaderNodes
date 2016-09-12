@@ -1,7 +1,9 @@
-import SimVis 1.0
+import ShaderNodes 1.0
 
 ShaderNode {
     property list<ShaderNode> inputs
+
+    exportedTypeName: "Sum"
 
     type: "float"
     source: {

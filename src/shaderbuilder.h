@@ -34,6 +34,7 @@ class ShaderBuilder : public Qt3DCore::QNode
     Q_PROPERTY(QString source READ source WRITE setSource NOTIFY sourceChanged)
     Q_PROPERTY(QUrl sourceFile READ sourceFile WRITE setSourceFile NOTIFY sourceFileChanged)
     Q_PROPERTY(QString finalShader READ finalShader NOTIFY finalShaderChanged)
+    Q_PROPERTY(QQmlListProperty<ShaderNode> inputs READ inputs CONSTANT)
     Q_PROPERTY(QQmlListProperty<ShaderOutput> outputs READ outputs CONSTANT)
     Q_PROPERTY(ShaderType shaderType READ shaderType WRITE setShaderType NOTIFY shaderTypeChanged)
     Q_PROPERTY(QMaterial* material READ material WRITE setMaterial NOTIFY materialChanged)
@@ -45,6 +46,7 @@ public:
     QString source() const;
     QString finalShader();
 
+    QQmlListProperty<ShaderNode> inputs();
     QQmlListProperty<ShaderOutput> outputs();
 
     QVariantMap uniforms() const;
@@ -90,11 +92,17 @@ private:
     static ShaderOutput *outputAt(QQmlListProperty<ShaderOutput> *list, int index);
     static void clearOutputs(QQmlListProperty<ShaderOutput> *list);
 
+    static void appendInput(QQmlListProperty<ShaderNode> *list, ShaderNode *input);
+    static int inputCount(QQmlListProperty<ShaderNode> *list);
+    static ShaderNode *inputAt(QQmlListProperty<ShaderNode> *list, int index);
+    static void clearInputs(QQmlListProperty<ShaderNode> *list);
+
     QString glslType(QVariant value) const;
     void clear();
 
     QString m_source;
     QList<ShaderOutput*> m_outputs;
+    QList<ShaderNode*> m_inputs;
     QList<UniformValue> m_uniforms;
     QList<QSignalMapper*> m_signalMappers;
     QUrl m_sourceFile;

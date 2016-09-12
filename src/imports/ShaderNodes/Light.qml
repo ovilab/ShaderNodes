@@ -1,4 +1,4 @@
-import SimVis 1.0
+import ShaderNodes 1.0
 
 ShaderNode {
     // TODO split light into multiple functions available for different materials (should perhaps be on each material?)
@@ -9,6 +9,8 @@ ShaderNode {
 
     property var attenuation: 1.0
     property var gamma: 1.0
+
+    exportedTypeName: "Light"
 
     name: "light"
     type: "Light"

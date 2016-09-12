@@ -6,14 +6,25 @@
 
 #include <QMutex>
 
-class ShaderUtils
+class QQmlEngine;
+class QJSEngine;
+
+class ShaderUtils : public QObject
 {
+    Q_OBJECT
+    Q_DISABLE_COPY(ShaderUtils)
 public:
-    static QString glslType(const QVariant &value);
-    static QString convert(const QString &sourceType, const QString &targetType, const QString &identifier);
-    static QString generateName();
-    static QString precisionQualifier(QString type);
-    static QString preferredType(const QVariant &value1, const QVariant &value2);
+    ShaderUtils();
+
+    Q_INVOKABLE static QString glslType(const QVariant &value);
+    Q_INVOKABLE static QString convert(const QString &sourceType, const QString &targetType, const QString &identifier);
+    Q_INVOKABLE static QString generateName();
+    Q_INVOKABLE static QString precisionQualifier(QString type);
+    Q_INVOKABLE static QString preferredType(const QVariant &value1, const QVariant &value2);
+    Q_INVOKABLE static QObject *qmlInstance(QQmlEngine *engine, QJSEngine *jsEngine);
+    Q_INVOKABLE static int componentCount(const QVariant &value);
+    Q_INVOKABLE static bool isList(const QVariant &value);
+    Q_INVOKABLE static QString serialize(const QVariant &value);
 private:
     static QMutex m_nameMutex;
     static int m_nameCounter;

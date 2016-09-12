@@ -1,6 +1,5 @@
-import SimVis 1.0
-import SimVis.ShaderNodes 1.0
-import SimVis.ShaderNodes 1.0 as Nodes
+import ShaderNodes 1.0
+import ShaderNodes 1.0 as Nodes
 
 import Qt3D.Core 2.0
 import Qt3D.Render 2.0
@@ -37,9 +36,6 @@ Material {
     ShaderBuilder {
         id: vertexShaderBuilder
 
-        shaderType: ShaderBuilder.Fragment
-        material: materialRoot
-
         // inputs
         property ShaderNode position: ShaderNode {
             type: "vec3"
@@ -57,9 +53,10 @@ Material {
             result: "vertexTexCoord"
         }
 
-        sourceFile: "qrc:/SimVis/ShaderNodes/shaders/gl3/shader_builder_material.vert"
+        shaderType: ShaderBuilder.Fragment
+        material: materialRoot
 
-//        onFinalShaderChanged: console.log(finalShader)
+        sourceFile: "qrc:/ShaderNodes/shaders/gl3/shader_builder_material.vert"
 
         outputs: [
             ShaderOutput {
@@ -73,46 +70,59 @@ Material {
     ShaderBuilder {
         id: shaderBuilder
 
+        // inputs
+        property alias position: position
+        property alias normal: normal
+        property alias tangent: tangent
+        property alias binormal: binormal
+        property alias textureCoordinate: textureCoordinate
+
         shaderType: ShaderBuilder.Fragment
         material: materialRoot
 
-        // inputs
-        property ShaderNode position: ShaderNode {
-            type: "vec3"
-            name: "position"
-            result: "position"
-        }
-        property ShaderNode normal: ShaderNode {
-            type: "vec3"
-            name: "normal"
-            result: "normal"
-        }
-        property ShaderNode tangent: ShaderNode {
-            type: "vec3"
-            name: "tangent"
-            result: "tangent"
-        }
-        property ShaderNode binormal: ShaderNode {
-            type: "vec3"
-            name: "binormal"
-            result: "binormal"
-        }
-        property ShaderNode textureCoordinate: ShaderNode {
-            type: "vec2"
-            name: "texCoord"
-            result: "texCoord"
-        }
+        sourceFile: "qrc:/ShaderNodes/shaders/gl3/shader_builder_material.frag"
 
 //        onFinalShaderChanged: console.log(finalShader)
 
-        sourceFile: "qrc:/SimVis/ShaderNodes/shaders/gl3/shader_builder_material.frag"
-
+        inputs: [
+            ShaderNode {
+                // TODO make a BuilderInputNode type
+                id: position
+                type: "vec3"
+                name: "position"
+                result: "position"
+            },
+            ShaderNode {
+                id: normal
+                type: "vec3"
+                name: "normal"
+                result: "normal"
+            },
+            ShaderNode {
+                id: tangent
+                type: "vec3"
+                name: "tangent"
+                result: "tangent"
+            },
+            ShaderNode {
+                id: binormal
+                type: "vec3"
+                name: "binormal"
+                result: "binormal"
+            },
+            ShaderNode {
+                id: textureCoordinate
+                type: "vec2"
+                name: "texCoord"
+                result: "texCoord"
+            }
+        ]
         outputs: [
             ShaderOutput {
                 id: _fragmentColor
                 type: "vec4"
                 name: "fragColor"
-                value: StandardMaterial {}
+                value: Add {}
             }
         ]
     }

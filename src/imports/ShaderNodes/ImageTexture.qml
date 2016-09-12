@@ -1,4 +1,4 @@
-import SimVis 1.0
+import ShaderNodes 1.0
 import Qt3D.Render 2.0
 
 ShaderNode {
@@ -24,6 +24,8 @@ ShaderNode {
             id: textureImage
         }
     }
+
+    exportedTypeName: "ImageTexture"
 
     name: "imagetexture"
     type: "vec4"

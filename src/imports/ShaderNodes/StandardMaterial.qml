@@ -1,6 +1,5 @@
 import QtQuick 2.5
-import SimVis 1.0
-import SimVis.ShaderNodes 1.0
+import ShaderNodes 1.0
 
 ShaderNode {
     property var color: "darkgrey"
@@ -31,6 +30,10 @@ ShaderNode {
         }
     ]
 
+    exportedTypeName: "StandardMaterial"
+
+    arrayProperties: ["lights"]
+
     name: "diffuse"
     type: "vec3"
     source: {
@@ -52,5 +55,5 @@ ShaderNode {
         return output
     }
 
-    headerFile: "qrc:/SimVis/ShaderNodes/shaders/standard_material.glsl"
+    headerFile: "qrc:/ShaderNodes/shaders/standard_material.glsl"
 }

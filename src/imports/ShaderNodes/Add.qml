@@ -1,10 +1,33 @@
-import SimVis 1.0
+import QtQuick 2.0 as QQ2
+
+import ShaderNodes 1.0
 
 ShaderNode {
-    property var value1: 0.0
-    property var value2: 0.0
+    id: root
+
+    property var values: [0.0]
+
+    arrayProperties: ["values"]
+    exportedTypeName: "Add"
 
     name: "add"
-    type: glslType(value1)
-    result: "$value1 + $(value2, " + type + ")"
+    type: ShaderNodes.glslType(values)
+
+    source: {
+        var result = ""
+        result += type + " $sumresult;\n"
+        if(values && values.length) {
+            for(var i in values) {
+                result += "$sumresult += $(values[" + i + "], " + type + ");\n"
+            }
+        } else {
+            result += "$sumresult = $values;\n"
+        }
+
+        return result;
+    }
+
+    result: "$sumresult"
+
+//    result: "$values"
 }

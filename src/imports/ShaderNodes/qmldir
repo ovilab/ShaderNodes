@@ -1,8 +1,12 @@
-module SimVis.ShaderNodes
+module ShaderNodes
+
+singleton ShaderNodes 1.0 ShaderNodes.qml
+
 Add 1.0 Add.qml
 AmbientOcclusion 1.0 AmbientOcclusion.qml
 Bump 1.0 Bump.qml
 Clamp 1.0 Clamp.qml
+CombineRgb 1.0 CombineRgb.qml
 Decolorize 1.0 Decolorize.qml
 Displacement 1.0 Displacement.qml
 Function 1.0 Function.qml

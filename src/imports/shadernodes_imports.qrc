@@ -3,9 +3,7 @@
         <file>ShaderNodes/Add.qml</file>
         <file>ShaderNodes/Geometry.qml</file>
         <file>ShaderNodes/Mix.qml</file>
-        <file>ShaderNodes/MainForm.ui.qml</file>
         <file>ShaderNodes/OutputValue.qml</file>
-        <file>ShaderNodes/Perlin.qml</file>
         <file>ShaderNodes/Sine.qml</file>
         <file>ShaderNodes/qmldir</file>
         <file>ShaderNodes/Split.qml</file>
@@ -36,5 +34,7 @@
         <file>ShaderNodes/AmbientOcclusion.qml</file>
         <file>ShaderNodes/images/ambient.png</file>
         <file>ShaderNodes/images/noise.png</file>
+        <file>ShaderNodes/ShaderNodes.qml</file>
+        <file>ShaderNodes/CombineRgb.qml</file>
     </qresource>
 </RCC>

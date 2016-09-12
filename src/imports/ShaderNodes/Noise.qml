@@ -1,12 +1,14 @@
-import SimVis 1.0
+import ShaderNodes 1.0
 
 ShaderNode {
     property var vector: ShaderBuilderBinding {
-        property: "texCoord"
+        property: "textureCoordinate"
     }
 
     property var scale: 1.0
     property var detail: 4.0
+
+    exportedTypeName: "Noise"
 
     type: "vec3"
     name: "noise"

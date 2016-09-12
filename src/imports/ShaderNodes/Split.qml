@@ -1,5 +1,5 @@
 import QtQuick 2.0
-import SimVis 1.0
+import ShaderNodes 1.0
 
 ShaderNode {
     id: splitRoot
@@ -15,6 +15,8 @@ ShaderNode {
         type: "float"
         dependencies: [splitRoot]
     }
+
+    exportedTypeName: "Split"
 
     name: "split"
     type: a.type

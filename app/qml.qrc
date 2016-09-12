@@ -5,5 +5,9 @@
         <file>Editor.qml</file>
         <file>Node.qml</file>
         <file>Edge.qml</file>
+        <file>Handle.qml</file>
+        <file>BezierCurve.qml</file>
+        <file>Plug.qml</file>
+        <file>HandleArray.qml</file>
     </qresource>
 </RCC>

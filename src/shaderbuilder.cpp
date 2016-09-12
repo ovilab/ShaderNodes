@@ -56,6 +56,15 @@ QString ShaderBuilder::finalShader()
     return m_finalShader;
 }
 
+QQmlListProperty<ShaderNode> ShaderBuilder::inputs()
+{
+    return QQmlListProperty<ShaderNode>(this, 0,
+                                          ShaderBuilder::appendInput,
+                                          ShaderBuilder::inputCount,
+                                          ShaderBuilder::inputAt,
+                                          ShaderBuilder::clearInputs);
+}
+
 QQmlListProperty<ShaderOutput> ShaderBuilder::outputs()
 {
     return QQmlListProperty<ShaderOutput>(this, 0,
@@ -99,6 +108,34 @@ void ShaderBuilder::clearOutputs(QQmlListProperty<ShaderOutput> *list)
         QObject::disconnect(output, &ShaderOutput::valueChanged, self, &ShaderBuilder::markDirty);
     }
     return self->m_outputs.clear();
+}
+
+void ShaderBuilder::appendInput(QQmlListProperty<ShaderNode> *list, ShaderNode *input)
+{
+    if(!input) {
+        return;
+    }
+
+    ShaderBuilder *self = static_cast<ShaderBuilder*>(list->object);
+    self->m_inputs.append(input);
+}
+
+int ShaderBuilder::inputCount(QQmlListProperty<ShaderNode> *list)
+{
+    ShaderBuilder *self = static_cast<ShaderBuilder*>(list->object);
+    return self->m_inputs.count();
+}
+
+ShaderNode *ShaderBuilder::inputAt(QQmlListProperty<ShaderNode> *list, int index)
+{
+    ShaderBuilder *self = static_cast<ShaderBuilder*>(list->object);
+    return self->m_inputs.at(index);
+}
+
+void ShaderBuilder::clearInputs(QQmlListProperty<ShaderNode> *list)
+{
+    ShaderBuilder *self = static_cast<ShaderBuilder*>(list->object);
+    return self->m_inputs.clear();
 }
 
 QVariantMap ShaderBuilder::uniforms() const

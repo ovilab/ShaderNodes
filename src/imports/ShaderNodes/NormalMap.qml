@@ -1,4 +1,4 @@
-import SimVis 1.0
+import ShaderNodes 1.0
 
 ShaderNode {
     property var strength: 1.0
@@ -15,6 +15,8 @@ ShaderNode {
         property: "binormal"
         defaultValue: Qt.vector3d(1.0, 0.0, 0.0)
     }
+
+    exportedTypeName: "NormalMap"
 
     name: "normalmap"
     type: "vec3"

@@ -3,13 +3,89 @@
 #include "shadernode.h"
 
 #include <QDebug>
+#include <QMetaProperty>
 #include <QJSEngine>
+#include <QQmlExpression>
+#include <QQmlEngine>
+#include <QVector2D>
+#include <QVector3D>
+#include <QVector4D>
 #include <Qt3DRender/QTexture>
 
 using Qt3DRender::QTexture2D;
 
 int ShaderUtils::m_nameCounter = 0;
 QMutex ShaderUtils::m_nameMutex;
+
+ShaderUtils::ShaderUtils()
+{
+}
+
+bool ShaderUtils::isList(const QVariant &value)
+{
+    return value.canConvert(QVariant::List);
+}
+
+int ShaderUtils::componentCount(const QVariant &value)
+{
+    QString type = glslType(value);
+    if(type == "vec2") {
+        return 2;
+    }
+    if(type == "vec3") {
+        return 3;
+    }
+    if(type == "vec4") {
+        return 4;
+    }
+    return 1;
+}
+
+QString ShaderUtils::serialize(const QVariant &value)
+{
+    switch(value.type()) {
+    case QVariant::Bool:
+        return value.toString();
+    case QVariant::Int:
+        return QString::number(value.toInt());
+    case QVariant::Double:
+        return QString::number(value.toDouble(), 'g', 3);
+    case QVariant::Vector2D: {
+        QVector2D vec2 = qvariant_cast<QVector2D>(value);
+        return QString("Qt.vector2d(" +
+                       QString::number(vec2.x()) + ", " +
+                       QString::number(vec2.y()) + ")");
+    }
+    case QVariant::Vector3D: {
+        QVector3D vec3 = qvariant_cast<QVector3D>(value);
+        return QString("Qt.vector3d(" +
+                       QString::number(vec3.x()) + ", " +
+                       QString::number(vec3.y()) + ", " +
+                       QString::number(vec3.z()) + ")");
+    }
+    case QVariant::Vector4D: {
+        QVector4D vec4 = qvariant_cast<QVector4D>(value);
+        return QString("Qt.vector4d(" +
+                       QString::number(vec4.x()) + ", " +
+                       QString::number(vec4.y()) + ", " +
+                       QString::number(vec4.z()) + ", " +
+                       QString::number(vec4.w()) + ")");
+    }
+    case QVariant::Color:{
+        QColor color = qvariant_cast<QColor>(value);
+        return QString("Qt.rgba(" +
+                       QString::number(color.redF()) + ", " +
+                       QString::number(color.greenF()) + ", " +
+                       QString::number(color.blueF()) + ", " +
+                       QString::number(color.alphaF()) + ", )");
+    }
+    case QVariant::String:
+        return "\"" + value.toString() + "\"";
+    default:
+        return QString("");
+        break;
+    }
+}
 
 QString ShaderUtils::glslType(const QVariant &value)
 {
@@ -20,6 +96,40 @@ QString ShaderUtils::glslType(const QVariant &value)
     QTexture2D *texture = qvariant_cast<QTexture2D*>(value);
     if(texture) {
         return "sampler2D";
+    }
+
+    QString typeName = value.typeName();
+    if(typeName == "QQmlListReference") {
+        QQmlListReference list = qvariant_cast<QQmlListReference>(value);
+        qDebug() << "QQmlListReference encountered, not possible to determine type.";
+        const QMetaObject* metaObject = list.listElementType();
+        for(int i = 0; i < metaObject->propertyCount(); i++) {
+            qDebug() << metaObject->property(i).name();
+        }
+        qDebug() << "Constructor count:" << metaObject->constructorCount();
+        return "list";
+//        for(int i = 0; i < list.count(); i++) {
+//            QObject* listObject = list.at(i);
+//            ShaderNode *node = qobject_cast<ShaderNode*>(listObject);
+//            if(!node) {
+//                qWarning() << "ERROR: Could not convert listed object to ShaderNode:" << listObject;
+//                return "invalid";
+//            }
+//            return node->type();
+//        }
+    }
+    if(value.canConvert(QVariant::List)) {
+        int highestComponentCount = 0;
+        QString bestType = "float";
+        QVariantList list = qvariant_cast<QVariantList>(value);
+        for(QVariant listValue : list) {
+            int currentComponentCount = componentCount(listValue);
+            if(currentComponentCount > highestComponentCount) {
+                highestComponentCount = currentComponentCount;
+                bestType = glslType(listValue);
+            }
+        }
+        return bestType;
     }
     switch(value.type()) {
     case QVariant::Bool:
@@ -40,8 +150,8 @@ QString ShaderUtils::glslType(const QVariant &value)
         // assume strings to be colors because there are no strings in GLSL
         return QString("vec4");
     default:
-        qWarning() << "ShaderUtils::glslType(): could not identify type of" << value;
-        return QString("float");
+        qWarning() << "ShaderUtils::glslType(): Could not identify type of" << value.typeName() << value;
+        return QString("invalid");
         break;
     }
 }
@@ -70,6 +180,13 @@ QString ShaderUtils::preferredType(const QVariant &value1, const QVariant &value
 
 }
 
+QObject *ShaderUtils::qmlInstance(QQmlEngine *engine, QJSEngine *jsEngine)
+{
+    Q_UNUSED(engine);
+    Q_UNUSED(jsEngine);
+    return new ShaderUtils;
+}
+
 QString ShaderUtils::convert(const QString &sourceType, const QString &targetType, const QString &identifier)
 {
     const QString &v = identifier;
@@ -86,6 +203,17 @@ QString ShaderUtils::convert(const QString &sourceType, const QString &targetTyp
         {"vec3", "vec2(" + v + ", " + v + ")"},
         {"vec3", "vec3(" + v + ", " + v + ", " + v + ")"},
         {"vec4", "vec4(" + v + ", " + v + ", " + v + ", 1.0)"}
+    };
+
+    QVariantMap empty{
+        {"bool", "false"},
+        {"int", "0"},
+        {"uint", "0"},
+        {"float", "0.0"},
+        {"double", "0.0"},
+        {"vec3", "vec2(0.0, 0.0)"},
+        {"vec3", "vec3(0.0, 0.0, 0.0)"},
+        {"vec4", "vec4(0.0, 0.0, 0.0, 1.0)"}
     };
 
     // conversions from->to->implementation
@@ -120,7 +248,7 @@ QString ShaderUtils::convert(const QString &sourceType, const QString &targetTyp
                 {"vec4", "texture(" + v + ", vec2(0.0, 0.0)).rgba"}
             }
         }
-        };
+    };
     if(conversions.contains(sourceType)) {
         QVariantMap typeConversions = conversions[sourceType].toMap();
         if(typeConversions.contains(targetType)) {
@@ -128,8 +256,15 @@ QString ShaderUtils::convert(const QString &sourceType, const QString &targetTyp
         }
     }
     qWarning() << "WARNING: ShaderUtils::convert(): No known conversion from "
-               << sourceType << " to " << targetType << ". Will return value directly.";
-    return v;
+               << sourceType << " to " << targetType << ".";
+
+    if(empty.contains(targetType)) {
+         qDebug() << "Will return empty target value.";
+        return empty[targetType].toString();
+    } else {
+        qDebug() << "No empty type found for" << targetType << ". Will return targetType name and hope that it works.";
+        return targetType + "()";
+    }
 }
 
 QString ShaderUtils::generateName()

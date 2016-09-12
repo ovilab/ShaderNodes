@@ -1,4 +1,4 @@
-import SimVis 1.0
+import ShaderNodes 1.0
 
 import Qt3D.Render 2.0
 
@@ -20,7 +20,7 @@ ShaderNode {
         }
         generateMipMaps: false
         TextureImage {
-            source: "qrc:/SimVis/ShaderNodes/images/ambient.png"
+            source: "qrc:/ShaderNodes/images/ambient.png"
         }
     }
     property var noiseTexture: Texture2D {
@@ -34,7 +34,7 @@ ShaderNode {
         }
         generateMipMaps: false
         TextureImage {
-            source: "qrc:/SimVis/ShaderNodes/images/noise.png"
+            source: "qrc:/ShaderNodes/images/noise.png"
         }
     }
     property var position: ShaderBuilderBinding {
@@ -54,6 +54,8 @@ ShaderNode {
     property string mode: "hemisphere"
     property int modeNumber: mode === "hemisphere" ? 1 : 0
 
+    exportedTypeName: "AmbientOcclusion"
+
     name: "ambient_occlusion"
     type: "float"
     result: "ambientOcclusion(
@@ -63,6 +65,6 @@ ShaderNode {
     $(cutoff, float), $(contrast, float),
     viewMatrix, projectionMatrix)"
 
-    headerFile: "qrc:/SimVis/ShaderNodes/shaders/ambient-occlusion.glsl"
+    headerFile: "qrc:/ShaderNodes/shaders/ambient-occlusion.glsl"
     // TODO make matrices explicit input
 }

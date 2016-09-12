@@ -1,4 +1,4 @@
-import SimVis 1.0
+import ShaderNodes 1.0
 
 ShaderNode {
     property var vector: ShaderBuilderBinding {
@@ -9,6 +9,8 @@ ShaderNode {
     property var strength: 1.0
     property var detail: 4.0
     property var offset: Qt.vector3d(0.0, 0.0, 0.0)
+
+    exportedTypeName: "Simplex"
 
     type: "vec3"
     name: {

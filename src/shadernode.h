@@ -25,8 +25,15 @@ class ShaderNode : public Qt3DCore::QNode
     Q_PROPERTY(QUrl headerFile READ headerFile WRITE setHeaderFile NOTIFY headerFileChanged)
     Q_PROPERTY(bool requirement READ requirement WRITE setRequirement NOTIFY requirementChanged)
     Q_PROPERTY(QQmlListProperty<ShaderNode> dependencies READ dependencies)
+    Q_PROPERTY(QString exportedTypeName READ exportedTypeName WRITE setExportedTypeName NOTIFY exportedTypeNameChanged)
+    Q_PROPERTY(QStringList arrayProperties READ arrayProperties WRITE setArrayProperties NOTIFY arrayPropertiesChanged)
 
 public:
+    enum class Status {
+        Failed,
+        Completed
+    };
+
     explicit ShaderNode(Qt3DCore::QNode *parent = 0);
 
     Q_INVOKABLE virtual QString generateHeader() const;
@@ -34,6 +41,7 @@ public:
     Q_INVOKABLE QString convert(const QString &targetType, const QString &identifier = QString()) const;
     Q_INVOKABLE QString glslType(QVariant value) const;
     Q_INVOKABLE QString preferredType(QVariant value1, QVariant value2) const;
+    Q_INVOKABLE QStringList inputNames() const;
 
     QString name() const;
     QString type() const;
@@ -53,6 +61,12 @@ public:
     void addDependency(ShaderNode *dependency);
     void removeDependency(ShaderNode *dependency);
     void clearDependencies();
+    QString exportedTypeName() const;
+
+    QStringList arrayProperties() const
+    {
+        return m_arrayProperties;
+    }
 
 signals:
     void nameChanged(QString name);
@@ -64,6 +78,9 @@ signals:
     void requirementChanged(bool requirement);
     void headerFileChanged(QUrl headerFile);
     void propertyTypeChanged();
+    void exportedTypeNameChanged(QString exportedTypeName);
+
+    void arrayPropertiesChanged(QStringList arrayProperties);
 
 public slots:
     void setName(QString name);
@@ -73,8 +90,18 @@ public slots:
     void setSource(QString source);
     void setRequirement(bool requirement);
     void setHeaderFile(QUrl headerFile);
+    void setExportedTypeName(QString exportedTypeName);
 
-protected:
+    void setArrayProperties(QStringList arrayProperties)
+    {
+        if (m_arrayProperties == arrayProperties)
+            return;
+
+        m_arrayProperties = arrayProperties;
+        emit arrayPropertiesChanged(arrayProperties);
+    }
+
+protected: // TODO make private
     mutable bool m_hasGeneratedHeader = false;
     mutable bool m_hasGeneratedBody = false;
     mutable bool m_hasSetup = false;
@@ -88,6 +115,7 @@ protected:
     bool m_requirement = true;
     QUrl m_headerFile;
     QVariantMap m_mappings;
+    QString m_exportedTypeName;
 
     QString m_resolvedSource;
     QList<ShaderNode*> m_resolvedDependencies;
@@ -98,6 +126,12 @@ protected:
     QList<QSignalMapper*> m_signalMappers;
 private slots:
     void handlePropertyChange(int index);
+
+private:
+    void replaceVariant(const QVariant &value, QString &sourceContent, bool &success, const QString &propertyName, const QString &propertyNameNoUnderscores, const QString &targetType);
+    QString generateUniformName(const QString &propertyName);
+    QString createUniform(const QString &propertyName, const QVariant &value);
+    QStringList m_arrayProperties;
 };
 
 #endif // SHADERNODE_H
