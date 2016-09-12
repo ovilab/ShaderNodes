@@ -5,6 +5,8 @@ Item {
     id: root
 
     signal dropped
+    signal reconnectTo(var to)
+    signal droppedNowhere
 
     property Handle from
     property Handle to
@@ -33,7 +35,9 @@ Item {
         onReleased: {
             dropCaught = false
             dragHandle.Drag.drop()
-            root.dropped()
+            if(!dropCaught) {
+                root.droppedNowhere()
+            }
         }
     }
 

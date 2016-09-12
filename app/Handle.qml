@@ -104,10 +104,7 @@ Item {
                 return
             }
             if(drop.keys.indexOf("edge") > -1) {
-                drag.source.edge.to.occupied = false
-                drag.source.edge.to = root
-                drag.source.edge.dropCaught = true
-                root.occupied = true
+                drag.source.edge.reconnectTo(root)
             } else {
                 dropReceived(drag.source.handle)
             }

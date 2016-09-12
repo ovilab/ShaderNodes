@@ -45,7 +45,37 @@ Rectangle {
 
         outputNode = nodes[2]
 
-        generate()
+        refreshOutput()
+    }
+
+    function removeOtherEdges(myEdge) {
+        var edgesToDelete = []
+        for(var i in edges) {
+            var edge = edges[i]
+            if(edge.to === myEdge.to && edge !== myEdge) {
+                edgesToDelete.push(edge)
+            }
+        }
+        for(var i in edgesToDelete) {
+            edge = edgesToDelete[i]
+            deleteEdge(edge)
+        }
+    }
+
+    function refreshOccupation() {
+        for(var i in nodes) {
+            var node = nodes[i]
+            for(var j in node.allHandles) {
+                var handle = node.allHandles[j]
+                handle.occupied = false
+            }
+        }
+
+        for(var i in edges) {
+            var edge = edges[i]
+            edge.from.occupied = true
+            edge.to.occupied = true
+        }
     }
 
     function createEdge(from, to) {
@@ -56,32 +86,28 @@ Rectangle {
         }
 
         var edge = edgeComponent.createObject(workspace, {from: from, to: to})
-        edge.dropped.connect(function() {
-            if(!edge.dropCaught) {
-                deleteEdge(edge)
-            } else {
-                var edgesToDelete = []
-                for(var i in edges) {
-                    var otherEdge = edges[i]
-                    if(edge.to === otherEdge.to && otherEdge !== edge) {
-                        edgesToDelete.push(otherEdge)
-                    }
-                }
-                for(var i in edgesToDelete) {
-                    var otherEdge = edgesToDelete[i]
-                    deleteEdge(otherEdge)
-                }
-            }
 
-            generate()
+        edge.droppedNowhere.connect(function() {
+            deleteEdge(edge)
+            refreshOutput()
+            refreshOccupation()
         })
-        edge.to.occupied = true
+
+        edge.reconnectTo.connect(function(to) {
+            edge.dropCaught = true
+            edge.to.occupied = false
+            edge.to = to
+            edge.to.occupied = true
+            removeOtherEdges(edge)
+            refreshOutput()
+        })
+
         edges.push(edge)
+        refreshOccupation()
         return edge
     }
 
     function deleteEdge(edge) {
-        edge.to.occupied = false
         edges.splice(edges.indexOf(edge), 1)
         edge.destroy()
     }
@@ -94,22 +120,13 @@ Rectangle {
         var node = nodeComponent.createObject(workspace, properties)
         node.parseNode(shaderNode)
         node.dropReceived.connect(function(from, to) {
-            var edgesToDelete = []
-            for(var i in edges) {
-                var edge = edges[i]
-                if(edge.to === to) {
-                    edgesToDelete.push(edge)
-                }
-            }
-            for(var i in edgesToDelete) {
-                edge = edgesToDelete[i]
-                deleteEdge(edge)
-            }
-            createEdge(from, to)
-            generate()
+            var edge = createEdge(from, to)
+            removeOtherEdges(edge)
+            refreshOutput()
+            refreshOccupation()
         })
         node.handleValueChanged.connect(function() {
-            generate()
+            refreshOutput()
         })
         nodes.push(node)
         return node
@@ -189,7 +206,7 @@ Rectangle {
         }
     }
 
-    function generate() {
+    function refreshOutput() {
         if(!finalNode) {
             console.warn("ERROR: Cannot generate tree.")
             console.warn("ERROR: Final node not set!")

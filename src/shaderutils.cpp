@@ -100,13 +100,13 @@ QString ShaderUtils::glslType(const QVariant &value)
 
     QString typeName = value.typeName();
     if(typeName == "QQmlListReference") {
-        QQmlListReference list = qvariant_cast<QQmlListReference>(value);
-        qDebug() << "QQmlListReference encountered, not possible to determine type.";
-        const QMetaObject* metaObject = list.listElementType();
-        for(int i = 0; i < metaObject->propertyCount(); i++) {
-            qDebug() << metaObject->property(i).name();
-        }
-        qDebug() << "Constructor count:" << metaObject->constructorCount();
+//        QQmlListReference list = qvariant_cast<QQmlListReference>(value);
+//        qDebug() << "QQmlListReference encountered, not possible to determine type.";
+//        const QMetaObject* metaObject = list.listElementType();
+//        for(int i = 0; i < metaObject->propertyCount(); i++) {
+//            qDebug() << metaObject->property(i).name();
+//        }
+//        qDebug() << "Constructor count:" << metaObject->constructorCount();
         return "list";
 //        for(int i = 0; i < list.count(); i++) {
 //            QObject* listObject = list.at(i);
