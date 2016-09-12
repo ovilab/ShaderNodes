@@ -56,6 +56,7 @@ Item {
 
         anchors.fill: parent
         drag.target: dragHandle
+        drag.threshold: 0
 
         onReleased: dragHandle.Drag.drop()
     }
@@ -102,8 +103,13 @@ Item {
                 console.log("Cannot connect to the same node")
                 return
             }
-
-            dropReceived(drag.source.handle)
+            if(drop.keys.indexOf("edge") > -1) {
+                drag.source.edge.to.occupied = false
+                drag.source.edge.to = root
+                root.occupied = true
+            } else {
+                dropReceived(drag.source.handle)
+            }
         }
     }
 
@@ -151,8 +157,8 @@ Item {
             horizontalCenter: plug.horizontalCenter
         }
 
-        width: 16
-        height: 16
+        width: 24
+        height: width
         visible: type === "output"
 
         Drag.keys: ["handle"]

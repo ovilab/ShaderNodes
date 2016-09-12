@@ -151,6 +151,7 @@ Item {
     MouseArea {
         anchors.fill: parent
         drag.target: parent
+        drag.threshold: 0
     }
 
     Column {

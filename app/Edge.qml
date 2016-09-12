@@ -26,6 +26,7 @@ Item {
         anchors.fill: reference
 
         drag.target: dragHandle
+        drag.threshold: 0
 
         onReleased: {
             dragHandle.Drag.drop()
@@ -45,12 +46,13 @@ Item {
         id: dragHandle
 
         property var handle: from
+        property var edge: root
 
         anchors {
             horizontalCenter: reference.horizontalCenter
             verticalCenter: reference.verticalCenter
         }
-        width: 12
+        width: 24
         height: width
 
         Drag.keys: ["edge"]

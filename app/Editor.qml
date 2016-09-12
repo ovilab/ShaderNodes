@@ -57,9 +57,9 @@ Rectangle {
 
         var edge = edgeComponent.createObject(workspace, {from: from, to: to})
         edge.dropped.connect(function() {
-            deleteEdge(edge)
             generate()
         })
+        console.log(edge.from, edge.to)
         edge.to.occupied = true
         edges.push(edge)
         return edge
