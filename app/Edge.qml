@@ -14,6 +14,8 @@ Item {
     property point startPoint: valid ? from.connectionPoint : Qt.point(0, 0)
     property point endPoint: valid ? to.connectionPoint : Qt.point(0, 0)
 
+    property bool dropCaught: false
+
     SCurve {
         id: sCurve
         startPoint: root.startPoint
@@ -29,6 +31,7 @@ Item {
         drag.threshold: 0
 
         onReleased: {
+            dropCaught = false
             dragHandle.Drag.drop()
             root.dropped()
         }

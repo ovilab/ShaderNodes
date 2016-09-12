@@ -104,8 +104,10 @@ Item {
                 return
             }
             if(drop.keys.indexOf("edge") > -1) {
+                console.log("Dropped on handle")
                 drag.source.edge.to.occupied = false
                 drag.source.edge.to = root
+                drag.source.edge.dropCaught = true
                 root.occupied = true
             } else {
                 dropReceived(drag.source.handle)
