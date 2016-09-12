@@ -224,7 +224,7 @@ QString ShaderUtils::convert(const QString &sourceType, const QString &targetTyp
         {"float", scalar},
         {"double", scalar},
         {"vec2", QVariantMap{
-                {"float", "0.5 * " + v + ".x + " + v + ".y)"},
+                {"float", "0.5 * (" + v + ".x + " + v + ".y)"},
                 {"vec3", "vec3(" + v + ", 0.0)"},
                 {"vec4", "vec4(" + v + ", 0.0, 1.0)"}
             }

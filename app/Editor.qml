@@ -1,6 +1,7 @@
 import QtQuick 2.7
 import QtQuick.Controls 2.0
 import QtQuick.Layouts 1.0
+import QtQuick.Controls.Material 2.0
 
 import ShaderNodes 1.0
 
@@ -19,6 +20,7 @@ Rectangle {
     property string output
 
     clip: true
+    color: Material.shade(Material.background, Material.Shade100)
 
     Component.onCompleted: {
         var addNode = Qt.createQmlObject("import ShaderNodes 1.0\nAdd {}", root, "Add")
@@ -48,6 +50,11 @@ Rectangle {
 
     function createEdge(from, to) {
         var edgeComponent = Qt.createComponent("Edge.qml")
+        if(edgeComponent.status !== Component.Ready) {
+            console.log(edgeComponent.errorString())
+            return
+        }
+
         var edge = edgeComponent.createObject(workspace, {from: from, to: to})
         edge.dropped.connect(function() {
             deleteEdge(edge)

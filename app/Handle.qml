@@ -1,5 +1,6 @@
 import QtQuick 2.0
 import QtQuick.Controls 2.0
+import QtQuick.Controls.Material 2.0
 
 Item {
     id: root
@@ -33,7 +34,7 @@ Item {
         }
 
         height: parent.height
-        color: occupied ? "yellow" : "purple"
+        color: occupied ? Material.shade(Material.accent, Material.Shade600) : Material.shade(Material.accent, Material.Shade200)
     }
 
     Label {
@@ -125,7 +126,22 @@ Item {
         }
     }
 
-    Rectangle {
+    SCurve {
+        id: sCurve
+        startPoint: root.connectionPoint
+        endPoint: Qt.point(dragHandle.x + dragHandle.width / 2, dragHandle.y + dragHandle.height / 2)
+        color: Material.foreground
+        parent: node.parent
+        visible: false
+
+        states: State {
+            when: mouseArea.drag.active
+//            ParentChange { target: sCurve; parent: node.parent }
+            PropertyChanges { target: sCurve; visible: true }
+        }
+    }
+
+    Item {
         id: dragHandle
 
         property var handle: root
@@ -137,8 +153,6 @@ Item {
 
         width: 16
         height: 16
-        radius: 8
-        color: "blue"
         visible: type === "output"
 
         Drag.keys: ["handle"]

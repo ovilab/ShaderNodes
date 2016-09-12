@@ -1,7 +1,11 @@
 import QtQuick 2.0
+import QtQuick.Controls 2.0
+import QtQuick.Controls.Material 2.0
+import QtGraphicalEffects 1.0
+
 import ShaderNodes 1.0
 
-Rectangle {
+Item {
     id: root
 
     signal dropReceived(var from, var to)
@@ -18,8 +22,6 @@ Rectangle {
 
     width: 360
     height: Math.max(inputColumn.y + inputColumn.height, outputColumn.y + outputColumn.height) + 24
-
-    color: "red"
 
     Component.onCompleted: {
     }
@@ -129,6 +131,23 @@ Rectangle {
         updateHandleConnectionPoints()
     }
 
+
+    Rectangle {
+        id: background
+        anchors.fill: parent
+        radius: 6.0
+        color: Material.background
+    }
+
+    DropShadow {
+        anchors.fill: background
+        source: background
+        radius: 12
+        verticalOffset: 4
+        horizontalOffset: 2
+        samples: 16
+    }
+
     MouseArea {
         anchors.fill: parent
         drag.target: parent
@@ -154,7 +173,7 @@ Rectangle {
         spacing: 8
     }
 
-    Text {
+    Label {
         id: titleText
         anchors {
             margins: 8

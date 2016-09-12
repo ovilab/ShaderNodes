@@ -10,5 +10,6 @@
         <file>Plug.qml</file>
         <file>HandleArray.qml</file>
         <file>qtquickcontrols2.conf</file>
+        <file>SCurve.qml</file>
     </qresource>
 </RCC>

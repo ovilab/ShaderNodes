@@ -67,7 +67,7 @@ ApplicationWindow {
         shaderBuilderMaterial: previewScene.material
     }
 
-    Rectangle {
+    Pane {
         id: shader
         anchors {
             top: parent.top
@@ -89,7 +89,7 @@ ApplicationWindow {
             ScrollBar.vertical: ScrollBar {}
             ScrollBar.horizontal: ScrollBar {}
 
-            Text {
+            Label {
                 id: shaderText
 //                selectByKeyboard: true
 //                selectByMouse: true
