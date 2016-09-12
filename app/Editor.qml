@@ -62,7 +62,6 @@ Rectangle {
             }
             generate()
         })
-        console.log(edge.from, edge.to)
         edge.to.occupied = true
         edges.push(edge)
         return edge
