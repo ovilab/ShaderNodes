@@ -59,7 +59,20 @@ Rectangle {
         edge.dropped.connect(function() {
             if(!edge.dropCaught) {
                 deleteEdge(edge)
+            } else {
+                var edgesToDelete = []
+                for(var i in edges) {
+                    var otherEdge = edges[i]
+                    if(edge.to === otherEdge.to && otherEdge !== edge) {
+                        edgesToDelete.push(otherEdge)
+                    }
+                }
+                for(var i in edgesToDelete) {
+                    var otherEdge = edgesToDelete[i]
+                    deleteEdge(otherEdge)
+                }
             }
+
             generate()
         })
         edge.to.occupied = true
