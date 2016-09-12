@@ -36,7 +36,7 @@ Item {
         color: occupied ? "yellow" : "purple"
     }
 
-    Text {
+    Label {
         id: nameText
         anchors {
             left: type === "input" ? plug.right : undefined
@@ -61,7 +61,7 @@ Item {
 
     Rectangle {
         anchors {
-            left: sliderText.right
+            left: slider.right
             verticalCenter: nameText.verticalCenter
         }
 
@@ -106,29 +106,23 @@ Item {
         }
     }
 
-    Slider {
+    TextField {
         id: slider
         visible: type === "input" && !root.occupied && glslType == "float"
         anchors {
             left: nameText.right
+            verticalCenter: parent.verticalCenter
+            margins: 8
         }
         width: 64
-        value: visible ? root.value : 0
 
-        Binding {
-            target: slider.visible ? root : null
-            property: "value"
-            value: slider.value
-        }
-    }
+        inputMethodHints: Qt.ImhPreferNumbers
 
-    Text {
-        id: sliderText
-        anchors {
-            left: slider.right
+        text: visible ? root.value : 0
+
+        onAccepted: {
+            root.value = parseFloat(text)
         }
-        visible: slider.visible
-        text: slider.value.toFixed(1)
     }
 
     Rectangle {

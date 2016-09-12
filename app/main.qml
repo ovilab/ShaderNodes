@@ -15,8 +15,7 @@ ApplicationWindow {
             top: parent.top
             bottom: parent.bottom
         }
-        width: parent.width * 0.15
-
+        width: parent.width * 0.10
         model: ListModel {
             ListElement {name: "Add"}
             ListElement {name: "AmbientOcclusion"}
@@ -60,9 +59,10 @@ ApplicationWindow {
         anchors {
             left: shaderList.right
             top: parent.top
-            right: parent.horizontalCenter
             bottom: parent.bottom
         }
+
+        width: parent.width * 0.6
 
         shaderBuilderMaterial: previewScene.material
     }
@@ -72,9 +72,9 @@ ApplicationWindow {
         anchors {
             top: parent.top
             left: editor.right
-            bottom: parent.bottom
+            bottom: parent.verticalCenter
+            right: parent.right
         }
-        width: parent.width * 0.25
         clip: true
 
         Flickable {
@@ -104,8 +104,8 @@ ApplicationWindow {
 
         anchors {
             right: parent.right
-            top: parent.top
-            left: shader.right
+            top: parent.verticalCenter
+            left: editor.right
             bottom: parent.bottom
         }
     }

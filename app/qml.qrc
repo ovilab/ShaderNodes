@@ -9,5 +9,6 @@
         <file>BezierCurve.qml</file>
         <file>Plug.qml</file>
         <file>HandleArray.qml</file>
+        <file>qtquickcontrols2.conf</file>
     </qresource>
 </RCC>
