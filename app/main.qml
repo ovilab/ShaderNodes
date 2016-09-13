@@ -1,12 +1,20 @@
 import QtQuick 2.7
 import QtQuick.Controls 2.0
 import QtQuick.Layouts 1.0
+import Qt.labs.settings 1.0
 
 ApplicationWindow {
+    id: root
     visible: true
     width: 1920
     height: 1080
     title: qsTr("ShaderNodes")
+
+    Settings {
+        id: settings
+        property alias windowWidth: root.width
+        property alias windowHeight: root.height
+    }
 
     ListView {
         id: shaderList
@@ -68,36 +76,69 @@ ApplicationWindow {
     }
 
     Pane {
-        id: shader
+        id: propertiesPane
         anchors {
             top: parent.top
-            left: editor.right
             bottom: parent.verticalCenter
             right: parent.right
+            left: editor.right
         }
-        clip: true
 
-        Flickable {
+        Column {
             anchors {
-                margins: 16
-                fill: parent
+                left: parent.left
+                right: parent.right
             }
 
-            contentWidth: shaderText.width
-            contentHeight: shaderText.height
-
-            ScrollBar.vertical: ScrollBar {}
-            ScrollBar.horizontal: ScrollBar {}
-
-            Label {
-                id: shaderText
-//                selectByKeyboard: true
-//                selectByMouse: true
-//                readOnly: true
-                text: editor.output //+ "\n" + editor.shaderBuilder.finalShader
+            Repeater {
+                model: editor.activeNode ? editor.activeNode.handles : undefined
+                Rectangle {
+                    anchors {
+                        left: parent.left
+                        right: parent.right
+                    }
+                    width: 120
+                    height: 80
+                    Text {
+                        anchors.centerIn: parent
+                        text: model.name
+                    }
+                }
             }
         }
     }
+
+//    Pane {
+//        id: shader
+//        anchors {
+//            top: parent.top
+//            left: editor.right
+//            bottom: parent.verticalCenter
+//            right: parent.right
+//        }
+//        clip: true
+
+//        Flickable {
+//            anchors {
+//                margins: 16
+//                fill: parent
+//            }
+
+//            contentWidth: shaderText.width
+//            contentHeight: shaderText.height
+
+//            ScrollBar.vertical: ScrollBar {}
+//            ScrollBar.horizontal: ScrollBar {}
+
+//            Label {
+//                id: shaderText
+////                selectByKeyboard: true
+////                selectByMouse: true
+////                readOnly: true
+//                text: editor.output //+ "\n" + editor.shaderBuilder.finalShader
+//            }
+//        }
+//    }
 
     PreviewScene {
         id: previewScene

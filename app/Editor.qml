@@ -11,6 +11,7 @@ Rectangle {
     property var nodes: []
     property var edges: []
     property Node finalNode
+    property Node activeNode
 
     property var outputNode
 
@@ -112,6 +113,13 @@ Rectangle {
         edge.destroy()
     }
 
+    function deselectAll() {
+        for(var i in nodes) {
+            var otherNode = nodes[i]
+            otherNode.selected = false
+        }
+    }
+
     function createNode(shaderNode, properties) {
         var nodeComponent = Qt.createComponent("Node.qml")
         if(nodeComponent.status !== Component.Ready) {
@@ -127,6 +135,11 @@ Rectangle {
         })
         node.handleValueChanged.connect(function() {
             refreshOutput()
+        })
+        node.clicked.connect(function() {
+            deselectAll()
+            activeNode = node
+            node.selected = true
         })
         nodes.push(node)
         return node
@@ -280,6 +293,11 @@ Rectangle {
             
             width: 3840
             height: 2160
+
+            MouseArea {
+                anchors.fill: parent
+                onClicked: deselectAll()
+            }
         }
     }
 }

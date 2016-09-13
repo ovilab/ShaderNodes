@@ -10,6 +10,7 @@ Item {
 
     signal dropReceived(var from, var to)
     signal handleValueChanged()
+    signal clicked
 
     property var inputHandles: []
     property var outputHandles: []
@@ -19,6 +20,7 @@ Item {
     property string exportedTypeName
     property string name
     property bool virtualized: exportedTypeName.length < 1
+    property bool selected: false
 
     width: 360
     height: Math.max(inputColumn.y + inputColumn.height, outputColumn.y + outputColumn.height) + 24
@@ -140,18 +142,47 @@ Item {
     }
 
     DropShadow {
+        id: dropShadow
         anchors.fill: background
         source: background
         radius: 12
         verticalOffset: 4
         horizontalOffset: 2
         samples: 16
+        color: "#FF000000"
+        smooth: true
+        antialiasing: true
+
+        states: [
+            State {
+                when: selected
+                PropertyChanges {
+                    target: dropShadow
+                    verticalOffset: 0
+                    horizontalOffset: 0
+                    color: "#FF117799"
+                }
+            }
+        ]
+
+        transitions: [
+            Transition {
+                from: "*"
+                to: "*"
+                PropertyAnimation {
+                    properties: "color,verticalOffset,horizontalOffset"
+                    duration: 120
+                    easing.type: Easing.InOutQuad
+                }
+            }
+        ]
     }
 
     MouseArea {
         anchors.fill: parent
         drag.target: parent
-        drag.threshold: 0
+        drag.threshold: 4
+        onClicked: root.clicked()
     }
 
     Column {
