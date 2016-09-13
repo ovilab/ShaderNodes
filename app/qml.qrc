@@ -11,5 +11,7 @@
         <file>HandleArray.qml</file>
         <file>qtquickcontrols2.conf</file>
         <file>SCurve.qml</file>
+        <file>PropertiesPane.qml</file>
+        <file>images/colorwheel.png</file>
     </qresource>
 </RCC>

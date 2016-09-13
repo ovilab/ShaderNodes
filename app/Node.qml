@@ -19,6 +19,7 @@ Item {
     property string identifier
     property string exportedTypeName
     property string name
+    property string title: exportedTypeName ? exportedTypeName : name
     property bool virtualized: exportedTypeName.length < 1
     property bool selected: false
 
@@ -212,6 +213,6 @@ Item {
             top: parent.top
             horizontalCenter: parent.horizontalCenter
         }
-        text: exportedTypeName ? exportedTypeName : name
+        text: title
     }
 }

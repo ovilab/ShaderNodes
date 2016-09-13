@@ -75,8 +75,9 @@ ApplicationWindow {
         shaderBuilderMaterial: previewScene.material
     }
 
-    Pane {
+    PropertiesPane {
         id: propertiesPane
+
         anchors {
             top: parent.top
             bottom: parent.verticalCenter
@@ -84,28 +85,7 @@ ApplicationWindow {
             left: editor.right
         }
 
-        Column {
-            anchors {
-                left: parent.left
-                right: parent.right
-            }
-
-            Repeater {
-                model: editor.activeNode ? editor.activeNode.handles : undefined
-                Rectangle {
-                    anchors {
-                        left: parent.left
-                        right: parent.right
-                    }
-                    width: 120
-                    height: 80
-                    Text {
-                        anchors.centerIn: parent
-                        text: model.name
-                    }
-                }
-            }
-        }
+        editor: editor
     }
 
 //    Pane {

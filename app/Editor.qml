@@ -39,6 +39,7 @@ Rectangle {
         var standardMaterial = createNode(standardNode, {x: 800, y: 400})
 
         finalNode = standardMaterial
+        activeNode = finalNode
 
         createEdge(nodes[0].outputHandles[0], mix.inputHandles[0])
         createEdge(nodes[2].outputHandles[0], mix.inputHandles[1])
@@ -118,6 +119,7 @@ Rectangle {
             var otherNode = nodes[i]
             otherNode.selected = false
         }
+        activeNode = null
     }
 
     function createNode(shaderNode, properties) {
@@ -197,7 +199,7 @@ Rectangle {
                     }
                 }
                 if(!found) {
-                    if(handle.value != handle.defaultValue) {
+                    if(handle.value !== handle.defaultValue) {
                         var serialized = ShaderUtils.serialize(handle.value)
                         if(serialized) {
                             addOutput(handle.identifier + ": " + serialized)

@@ -77,7 +77,7 @@ QString ShaderUtils::serialize(const QVariant &value)
                        QString::number(color.redF()) + ", " +
                        QString::number(color.greenF()) + ", " +
                        QString::number(color.blueF()) + ", " +
-                       QString::number(color.alphaF()) + ", )");
+                       QString::number(color.alphaF()) + ")");
     }
     case QVariant::String:
         return "\"" + value.toString() + "\"";
@@ -85,6 +85,11 @@ QString ShaderUtils::serialize(const QVariant &value)
         return QString("");
         break;
     }
+}
+
+ShaderUtils::Type ShaderUtils::variantType(const QVariant &value)
+{
+    return static_cast<ShaderUtils::Type>(value.type());
 }
 
 QString ShaderUtils::glslType(const QVariant &value)
@@ -154,6 +159,12 @@ QString ShaderUtils::glslType(const QVariant &value)
         return QString("invalid");
         break;
     }
+}
+
+QColor ShaderUtils::hsv(double h, double s, double v, double a)
+{
+    qDebug() << h << s << v << a;
+    return QColor::fromHsvF(h, s, v, a);
 }
 
 QString ShaderUtils::preferredType(const QVariant &value1, const QVariant &value2)
