@@ -24,9 +24,13 @@ Rectangle {
     color: Material.shade(Material.background, Material.Shade100)
 
     Component.onCompleted: {
-        var addNode = Qt.createQmlObject("import ShaderNodes 1.0\nAdd {}", root, "Add")
-        var mixNode = Qt.createQmlObject("import ShaderNodes 1.0\nMix {}", root, "Mix")
-        var standardNode = Qt.createQmlObject("import ShaderNodes 1.0\nStandardMaterial {}", root, "StandardMaterial")
+        var addComponent = Qt.createComponent("/ShaderNodes/Add.qml")
+        var mixComponent = Qt.createComponent("/ShaderNodes/Mix.qml")
+        var standardComponent = Qt.createComponent("/ShaderNodes/StandardMaterial.qml")
+
+        var addNode = addComponent.createObject(root)
+        var mixNode = mixComponent.createObject(root)
+        var standardNode = standardComponent.createObject(standardNode)
 
         var offset = 100
         for(var i in shaderBuilder.inputs) {
