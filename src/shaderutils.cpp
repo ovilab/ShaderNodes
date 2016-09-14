@@ -163,8 +163,22 @@ QString ShaderUtils::glslType(const QVariant &value)
 
 QColor ShaderUtils::hsv(double h, double s, double v, double a)
 {
-    qDebug() << h << s << v << a;
     return QColor::fromHsvF(h, s, v, a);
+}
+
+double ShaderUtils::hsvHue(const QColor &color)
+{
+    return color.hsvHueF();
+}
+
+double ShaderUtils::hsvSaturation(const QColor &color)
+{
+    return color.hsvSaturationF();
+}
+
+double ShaderUtils::hsvValue(const QColor &color)
+{
+    return color.valueF();
 }
 
 QString ShaderUtils::preferredType(const QVariant &value1, const QVariant &value2)

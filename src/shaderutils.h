@@ -96,6 +96,9 @@ public:
     Q_INVOKABLE static QString serialize(const QVariant &value);
     Q_INVOKABLE static Type variantType(const QVariant &value);
     Q_INVOKABLE static QColor hsv(double h, double s, double v, double a = 1.0);
+    Q_INVOKABLE static double hsvHue(const QColor &color);
+    Q_INVOKABLE static double hsvSaturation(const QColor &color);
+    Q_INVOKABLE static double hsvValue(const QColor &color);
 private:
     static QMutex m_nameMutex;
     static int m_nameCounter;

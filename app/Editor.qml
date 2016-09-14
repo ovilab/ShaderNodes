@@ -43,7 +43,7 @@ Rectangle {
 
         createEdge(nodes[0].outputHandles[0], mix.inputHandles[0])
         createEdge(nodes[2].outputHandles[0], mix.inputHandles[1])
-        createEdge(mix.outputHandles[0], standardMaterial.inputHandles[0])
+        createEdge(mix.outputHandles[0], standardMaterial.inputHandles[4])
 
         outputNode = nodes[2]
 

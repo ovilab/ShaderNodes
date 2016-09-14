@@ -83,10 +83,16 @@ Pane {
                         property real hue: 0.5
                         property real saturation: 0.5
                         property real value: 0.5
-                        property color color: ShaderUtils.hsv(colorPicker.hue, colorPicker.saturation, colorPicker.value)
+                        property color color: handle.value
+
+                        function updateHandleValue() {
+                            handle.value = ShaderUtils.hsv(hue, saturation, value)
+                        }
 
                         onColorChanged: {
-                            handle.value = color
+                            hue = ShaderUtils.hsvHue(color)
+                            saturation = ShaderUtils.hsvSaturation(color)
+                            value = ShaderUtils.hsvValue(color)
                         }
 
                         height: label.height + 12
@@ -200,6 +206,8 @@ Pane {
 
                                                 colorPicker.hue = Math.max(0.0, Math.min(1.0, phi / (2 * Math.PI)))
                                                 colorPicker.saturation = Math.max(0.0, Math.min(1.0, r))
+
+                                                updateHandleValue()
                                             }
 
                                             onPressed: movePicker(mouse)
@@ -248,6 +256,8 @@ Pane {
                                             function movePicker(mouse) {
                                                 var lightness = (height - mouse.y) / height
                                                 colorPicker.value = Math.max(0.0, Math.min(1.0, lightness))
+
+                                                updateHandleValue()
                                             }
 
                                             onPressed: movePicker(mouse)
