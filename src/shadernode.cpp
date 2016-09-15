@@ -475,6 +475,7 @@ void ShaderNode::setShaderBuilder(ShaderBuilder *shaderBuilder)
         disconnect(this, &ShaderNode::typeChanged, m_shaderBuilder, &ShaderBuilder::markDirty);
         disconnect(this, &ShaderNode::identifierChanged, m_shaderBuilder, &ShaderBuilder::markDirty);
         disconnect(this, &ShaderNode::propertyTypeChanged, m_shaderBuilder, &ShaderBuilder::markDirty);
+        disconnect(this, &ShaderNode::markDirty, m_shaderBuilder, &ShaderBuilder::markDirty);
     }
     m_shaderBuilder = shaderBuilder;
     if(!m_shaderBuilder) {
@@ -486,6 +487,7 @@ void ShaderNode::setShaderBuilder(ShaderBuilder *shaderBuilder)
     connect(this, &ShaderNode::typeChanged, m_shaderBuilder, &ShaderBuilder::markDirty);
     connect(this, &ShaderNode::identifierChanged, m_shaderBuilder, &ShaderBuilder::markDirty);
     connect(this, &ShaderNode::propertyTypeChanged, m_shaderBuilder, &ShaderBuilder::markDirty);
+    connect(this, &ShaderNode::markDirty, m_shaderBuilder, &ShaderBuilder::markDirty);
 }
 
 QString ShaderNode::glslType(QVariant value) const

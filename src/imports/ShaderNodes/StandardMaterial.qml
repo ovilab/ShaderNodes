@@ -20,15 +20,17 @@ ShaderNode {
         property: "position"
         defaultValue: Qt.vector3d(0.0, 0.0, 0.0)
     }
-    property list<Light> lights
 
-    property list<Light> _defaultLights: [
-        Light {
-            position: Qt.vector3d(46, 20, -10)
-            attenuation: 0.0
-            strength: 1.0
-        }
-    ]
+    property var lights: [defaultLight]
+
+    onLightsChanged: markDirty()
+
+    Light {
+        id: defaultLight
+        position: Qt.vector3d(46, 20, -10)
+        attenuation: 0.0
+        strength: 1.0
+    }
 
     exportedTypeName: "StandardMaterial"
 
@@ -39,15 +41,9 @@ ShaderNode {
     source: {
         var output = ""
         output += "$this = vec3(0.0, 0.0, 0.0);\n"
-        var lightList = lights
-        var lightVariable = "lights"
-        if (lightList.length < 1) {
-            lightList = _defaultLights
-            lightVariable = "_defaultLights"
-        }
 
-        for(var i in lightList) {
-            output += "$this += standardMaterialLight($" + lightVariable + "[" + i + "], $(normal, vec3), $(position, vec3), eyePosition,\n"
+        for(var i in lights) {
+            output += "$this += standardMaterialLight($lights[" + i + "], $(normal, vec3), $(position, vec3), eyePosition,\n"
             output += "             $(ambientColor, vec3), $(diffuseColor, vec3), $(specularColor, vec3),\n"
             output += "             0.01 * $(ambientIntensity, float), $(diffuseIntensity, float), 0.01 * $(specularIntensity, float),\n"
             output += "             150.0 * $(hardness, float));\n"

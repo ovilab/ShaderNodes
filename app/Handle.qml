@@ -63,7 +63,7 @@ Item {
 
     Rectangle {
         anchors {
-            left: slider.right
+            left: nameText.right
             verticalCenter: nameText.verticalCenter
         }
 
@@ -108,25 +108,6 @@ Item {
             } else {
                 dropReceived(drag.source.handle)
             }
-        }
-    }
-
-    TextField {
-        id: slider
-        visible: type === "input" && !root.occupied && glslType == "float"
-        anchors {
-            left: nameText.right
-            verticalCenter: parent.verticalCenter
-            margins: 8
-        }
-        width: 64
-
-        inputMethodHints: Qt.ImhPreferNumbers
-
-        text: visible ? root.value : 0
-
-        onAccepted: {
-            root.value = parseFloat(text)
         }
     }
 

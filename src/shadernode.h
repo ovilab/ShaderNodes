@@ -79,8 +79,8 @@ signals:
     void headerFileChanged(QUrl headerFile);
     void propertyTypeChanged();
     void exportedTypeNameChanged(QString exportedTypeName);
-
     void arrayPropertiesChanged(QStringList arrayProperties);
+    void markDirty();
 
 public slots:
     void setName(QString name);

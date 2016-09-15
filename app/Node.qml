@@ -87,7 +87,7 @@ Item {
             root.dropReceived(from, handle)
         })
         handle.valueChanged.connect(function() {
-            shaderNode[handle.name] = handle.value
+//            shaderNode[handle.name] = handle.value
             root.handleValueChanged()
         })
         inputHandles.push(handle)

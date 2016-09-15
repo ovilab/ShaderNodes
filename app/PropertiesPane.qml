@@ -300,8 +300,6 @@ Pane {
                     }
                     
                     sourceComponent: {
-                        console.log(ShaderUtils.variantType(handle.defaultValue))
-
                         if(handle.occupied) {
                             return occupiedComponent
                         }

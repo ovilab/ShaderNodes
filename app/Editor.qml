@@ -60,31 +60,67 @@ Rectangle {
         }
     }
 
-    function disconnectPropertiesFromEdges() {
-        for(var i in edges) {
-            var edge = edges[i]
-            var fromProperty = edge.from.name
-            var toHandle = edge.to
-            var toProperty = edge.to.name
-            var fromNode = edge.from.node.shaderNode
-            var toNode = edge.to.node.shaderNode
-            toNode[toProperty] = toHandle.value
-        }
+    function createHandleBinding(handle){
+        return Qt.binding(function() {
+            return handle.value
+        })
     }
 
-    function connectPropertiesToEdges() {
-        for(var i in edges) {
-            var edge = edges[i]
-            var fromProperty = edge.from.name
-            var toProperty = edge.to.name
-            var fromNode = edge.from.node.shaderNode
-            var toNode = edge.to.node.shaderNode
-            toNode[toProperty] = fromNode
+    function refreshValues() {
+        for(var i in nodes) {
+            var node = nodes[i]
+            var foundHandles = []
+            var arrayHandles = {}
+            for(var k in node.inputHandles) {
+                var handle = node.inputHandles[k]
+                if(handle.arrayBased) {
+                    var found = false
+                    for(var j in edges) {
+                        var edge = edges[j]
+                        var fromShaderNode = edge.from.node.shaderNode
+                        if(edge.to === handle) {
+                            if(arrayHandles[handle.identifier]) {
+                                arrayHandles[handle.identifier].push(fromShaderNode)
+                            } else {
+                                arrayHandles[handle.identifier] = [fromShaderNode]
+                            }
+                            found = true
+                            break
+                        }
+                    }
+                    if(!found) {
+                        if(handle.value !== handle.defaultValue) {
+                            var serializedValue = handle.value
+                            if(arrayHandles[handle.identifier]) {
+                                arrayHandles[handle.identifier].push(serializedValue)
+                            } else {
+                                arrayHandles[handle.identifier] = [serializedValue]
+                            }
+                        }
+                    }
+                } else {
+                    var found = false
+                    for(var j in edges) {
+                        var edge = edges[j]
+                        if(edge.to === handle) {
+                            handle.node.shaderNode[handle.identifier] = edge.from.node.shaderNode
+                            found = true
+                            break
+                        }
+                    }
+                    if(!found) {
+                        handle.node.shaderNode[handle.identifier] = createHandleBinding(handle)
+                    }
+                }
+            }
+
+            for(var handleName in arrayHandles) {
+                node.shaderNode[handleName] = arrayHandles[handleName]
+            }
         }
     }
 
     function refreshOccupation() {
-        console.log("Refresh")
         for(var i in nodes) {
             var node = nodes[i]
             for(var j in node.allHandles) {
@@ -109,15 +145,13 @@ Rectangle {
         var edge = edgeComponent.createObject(workspace, {from: from, to: to})
 
         edge.droppedNowhere.connect(function() {
-            disconnectPropertiesFromEdges()
             deleteEdge(edge)
             refreshOutput()
             refreshOccupation()
-            connectPropertiesToEdges()
+            refreshValues()
         })
 
         edge.reconnectTo.connect(function(to) {
-            disconnectPropertiesFromEdges()
             edge.dropCaught = true
             edge.to.occupied = false
             edge.to = to
@@ -125,12 +159,12 @@ Rectangle {
             removeOtherEdges(edge)
             refreshOccupation()
             refreshOutput()
-            connectPropertiesToEdges()
+            refreshValues()
         })
 
         edges.push(edge)
         refreshOccupation()
-        connectPropertiesToEdges()
+        refreshValues()
         return edge
     }
 

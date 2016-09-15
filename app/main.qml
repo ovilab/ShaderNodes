@@ -50,13 +50,8 @@ ApplicationWindow {
 
         delegate: ItemDelegate {
             text: name
-            Loader {
-                id: node
-                source: "qrc:/ShaderNodes/" + name + ".qml"
-            }
-
             onClicked: {
-                editor.createNode(node.item, {x: 200, y: 200})
+                editor.createNode("qrc:/ShaderNodes/" + name + ".qml", {x: 200, y: 200})
             }
         }
     }
