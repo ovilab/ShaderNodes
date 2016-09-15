@@ -3,8 +3,12 @@
 
 #include <vendor.h>
 
+#include "nodewrapper.h"
+
 int main(int argc, char *argv[])
 {
+    qmlRegisterType<NodeWrapper>("ShaderNodesApp", 1, 0, "NodeWrapper");
+
     QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
     QGuiApplication app(argc, argv);
 

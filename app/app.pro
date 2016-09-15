@@ -1,8 +1,9 @@
-QT += qml quick
+QT += qml quick qml-private
 
 CONFIG += c++11
 
-SOURCES += main.cpp
+SOURCES += main.cpp \
+    nodewrapper.cpp
 
 RESOURCES += qml.qrc
 
@@ -13,4 +14,5 @@ QML_IMPORT_PATH =
 include(deployment.pri)
 include(../package_vendor.pri)
 
-HEADERS +=
+HEADERS += \
+    nodewrapper.h

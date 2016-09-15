@@ -2,6 +2,8 @@ import QtQuick 2.0
 import QtQuick.Controls 2.0
 import QtQuick.Controls.Material 2.0
 
+import ShaderNodesApp 1.0
+
 Item {
     id: root
 
@@ -24,6 +26,11 @@ Item {
 
     width: 120
     height: 24
+
+    function reset() {
+        node.nodeWrapper.resetProperty(name)
+        value = node.shaderNode[name]
+    }
 
     Plug {
         id: plug

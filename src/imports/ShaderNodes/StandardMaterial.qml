@@ -25,8 +25,7 @@ ShaderNode {
 
     onLightsChanged: markDirty()
 
-    Light {
-        id: defaultLight
+    property Light defaultLight: Light {
         position: Qt.vector3d(46, 20, -10)
         attenuation: 0.0
         strength: 1.0

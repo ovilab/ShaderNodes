@@ -106,6 +106,16 @@ Pane {
                             text: handle.name + ":"
                         }
 
+                        Button {
+                            anchors {
+                                left: label.right
+                            }
+                            text: "Reset"
+                            onClicked: {
+                                handle.reset()
+                            }
+                        }
+
                         Rectangle {
                             id: colorRect
 

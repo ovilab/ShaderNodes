@@ -4,6 +4,7 @@ import QtQuick.Controls.Material 2.0
 import QtGraphicalEffects 1.0
 
 import ShaderNodes 1.0
+import ShaderNodesApp 1.0
 
 Item {
     id: root
@@ -25,6 +26,7 @@ Item {
 
     property alias source: loader.source
     property ShaderNode shaderNode: loader.item ? loader.item : null
+    property alias nodeWrapper: nodeWrapper
 
     width: 360
     height: Math.max(inputColumn.y + inputColumn.height, outputColumn.y + outputColumn.height) + 24
@@ -143,6 +145,11 @@ Item {
 //        object.destroy()
 
         updateHandleConnectionPoints()
+    }
+
+    NodeWrapper {
+        id: nodeWrapper
+        shaderNode: root.shaderNode
     }
 
     Loader {
