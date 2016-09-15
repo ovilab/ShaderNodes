@@ -23,10 +23,14 @@ Item {
     property bool virtualized: exportedTypeName.length < 1
     property bool selected: false
 
+    property alias source: loader.source
+    property ShaderNode shaderNode: loader.item ? loader.item : null
+
     width: 360
     height: Math.max(inputColumn.y + inputColumn.height, outputColumn.y + outputColumn.height) + 24
 
     Component.onCompleted: {
+        parseNode(shaderNode)
     }
 
     onXChanged: {
@@ -43,6 +47,12 @@ Item {
 
     onHeightChanged: {
         updateHandleConnectionPoints()
+    }
+
+    function reloadShaderNode() {
+//        var tmp = loader.source
+//        loader.source = ""
+//        loader.source = tmp
     }
 
     function updateHandleConnectionPoints() {
@@ -77,6 +87,7 @@ Item {
             root.dropReceived(from, handle)
         })
         handle.valueChanged.connect(function() {
+            shaderNode[handle.name] = handle.value
             root.handleValueChanged()
         })
         inputHandles.push(handle)
@@ -134,6 +145,9 @@ Item {
         updateHandleConnectionPoints()
     }
 
+    Loader {
+        id: loader
+    }
 
     Rectangle {
         id: background

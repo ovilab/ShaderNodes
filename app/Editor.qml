@@ -24,23 +24,15 @@ Rectangle {
     color: Material.shade(Material.background, Material.Shade100)
 
     Component.onCompleted: {
-        var addComponent = Qt.createComponent("/ShaderNodes/Add.qml")
-        var mixComponent = Qt.createComponent("/ShaderNodes/Mix.qml")
-        var standardComponent = Qt.createComponent("/ShaderNodes/StandardMaterial.qml")
-
-        var addNode = addComponent.createObject(root)
-        var mixNode = mixComponent.createObject(root)
-        var standardNode = standardComponent.createObject(standardNode)
-
         var offset = 100
         for(var i in shaderBuilder.inputs) {
             var input = shaderBuilder.inputs[i]
-            var node = createNode(input, {x: 10, y: 10 + offset, identifier: "shaderBuilder.inputs[" + i + "]"})
+            var node = createInputNode(input, {x: 10, y: 10 + offset, identifier: "shaderBuilder.inputs[" + i + "]"})
             offset += 100
         }
 
-        var mix = createNode(mixNode, {x: 400, y: 10})
-        var standardMaterial = createNode(standardNode, {x: 800, y: 400})
+        var mix = createNode("/ShaderNodes/Mix.qml", {x: 400, y: 10})
+        var standardMaterial = createNode("/ShaderNodes/StandardMaterial.qml", {x: 800, y: 400})
 
         finalNode = standardMaterial
         activeNode = finalNode
@@ -68,7 +60,31 @@ Rectangle {
         }
     }
 
+    function disconnectPropertiesFromEdges() {
+        for(var i in edges) {
+            var edge = edges[i]
+            var fromProperty = edge.from.name
+            var toHandle = edge.to
+            var toProperty = edge.to.name
+            var fromNode = edge.from.node.shaderNode
+            var toNode = edge.to.node.shaderNode
+            toNode[toProperty] = toHandle.value
+        }
+    }
+
+    function connectPropertiesToEdges() {
+        for(var i in edges) {
+            var edge = edges[i]
+            var fromProperty = edge.from.name
+            var toProperty = edge.to.name
+            var fromNode = edge.from.node.shaderNode
+            var toNode = edge.to.node.shaderNode
+            toNode[toProperty] = fromNode
+        }
+    }
+
     function refreshOccupation() {
+        console.log("Refresh")
         for(var i in nodes) {
             var node = nodes[i]
             for(var j in node.allHandles) {
@@ -76,7 +92,6 @@ Rectangle {
                 handle.occupied = false
             }
         }
-
         for(var i in edges) {
             var edge = edges[i]
             edge.from.occupied = true
@@ -94,22 +109,28 @@ Rectangle {
         var edge = edgeComponent.createObject(workspace, {from: from, to: to})
 
         edge.droppedNowhere.connect(function() {
+            disconnectPropertiesFromEdges()
             deleteEdge(edge)
             refreshOutput()
             refreshOccupation()
+            connectPropertiesToEdges()
         })
 
         edge.reconnectTo.connect(function(to) {
+            disconnectPropertiesFromEdges()
             edge.dropCaught = true
             edge.to.occupied = false
             edge.to = to
             edge.to.occupied = true
             removeOtherEdges(edge)
+            refreshOccupation()
             refreshOutput()
+            connectPropertiesToEdges()
         })
 
         edges.push(edge)
         refreshOccupation()
+        connectPropertiesToEdges()
         return edge
     }
 
@@ -126,13 +147,13 @@ Rectangle {
         activeNode = null
     }
 
-    function createNode(shaderNode, properties) {
+    function createNode(source, properties) {
         var nodeComponent = Qt.createComponent("Node.qml")
         if(nodeComponent.status !== Component.Ready) {
             console.log(nodeComponent.errorString())
         }
+        properties.source = source
         var node = nodeComponent.createObject(workspace, properties)
-        node.parseNode(shaderNode)
         node.dropReceived.connect(function(from, to) {
             var edge = createEdge(from, to)
             removeOtherEdges(edge)
@@ -141,6 +162,31 @@ Rectangle {
         })
         node.handleValueChanged.connect(function() {
             refreshOutput()
+        })
+        node.clicked.connect(function() {
+            deselectAll()
+            activeNode = node
+            node.selected = true
+        })
+        nodes.push(node)
+        return node
+    }
+
+    function createInputNode(shaderNode, properties) {
+        var nodeComponent = Qt.createComponent("Node.qml")
+        if(nodeComponent.status !== Component.Ready) {
+            console.log(nodeComponent.errorString())
+        }
+        properties.shaderNode = shaderNode
+        var node = nodeComponent.createObject(workspace, properties)
+        node.dropReceived.connect(function(from, to) {
+            var edge = createEdge(from, to)
+            removeOtherEdges(edge)
+            refreshOutput()
+            refreshOccupation()
+        })
+        node.handleValueChanged.connect(function() {
+            refreshOutput() // TODO not needed
         })
         node.clicked.connect(function() {
             deselectAll()
@@ -259,7 +305,6 @@ Rectangle {
             if(node === finalNode) {
                 continue
             }
-
             if(node.virtualized) {
                 continue
             }
@@ -275,9 +320,9 @@ Rectangle {
         indentLevel -= 1
         addOutput("}")
 
-        var material = Qt.createQmlObject(output, root, "GeneratedMaterial")
+//        var material = Qt.createQmlObject(output, root, "GeneratedMaterial")
 //        material.shaderBuilder = shaderBuilder
-        shaderBuilderMaterial.fragmentColor = material
+        shaderBuilderMaterial.fragmentColor = finalNode.shaderNode // TODO do somewhere else
 
         return true
     }
