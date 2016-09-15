@@ -1,22 +1,22 @@
-#version 330 core
+#version 330
 #pragma shadernodes header
 
-in vec3 vertexPosition;
-in vec3 vertexNormal;
-in vec4 vertexTangent;
-in vec2 vertexTexCoord;
+in highp vec3 vertexPosition;
+in highp vec3 vertexNormal;
+in highp vec4 vertexTangent;
+in highp vec2 vertexTexCoord;
 
-out vec3 position;
-out vec3 normal;
-out vec3 tangent;
-out vec3 binormal;
-out vec2 texCoord;
+out highp vec3 position;
+out highp vec3 normal;
+out highp vec3 tangent;
+out highp vec3 binormal;
+out highp vec2 texCoord;
 
-uniform mat4 modelMatrix;
-uniform mat3 modelNormalMatrix;
-uniform mat4 viewMatrix;
-uniform mat4 projectionMatrix;
-uniform mat4 mvp;
+uniform highp mat4 modelMatrix;
+uniform highp mat3 modelNormalMatrix;
+uniform highp mat4 viewMatrix;
+uniform highp mat4 projectionMatrix;
+uniform highp mat4 mvp;
 
 void main() {
     texCoord = vertexTexCoord;
