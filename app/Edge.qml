@@ -59,7 +59,7 @@ Item {
             horizontalCenter: reference.horizontalCenter
             verticalCenter: reference.verticalCenter
         }
-        width: 24
+        width: 32
         height: width
 
         Drag.keys: ["edge"]
