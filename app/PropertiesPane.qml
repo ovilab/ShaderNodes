@@ -108,7 +108,7 @@ Pane {
 
                         Button {
                             anchors {
-                                left: label.right
+                                right: colorRect.left
                             }
                             text: "Reset"
                             onClicked: {

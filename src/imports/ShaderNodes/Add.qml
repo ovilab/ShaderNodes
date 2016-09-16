@@ -28,6 +28,4 @@ ShaderNode {
     }
 
     result: "$sumresult"
-
-//    result: "$values"
 }

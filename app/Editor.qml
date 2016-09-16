@@ -20,6 +20,7 @@ Rectangle {
     property int indentLevel: 0
     property string output
 
+    focus: true
     clip: true
     color: Material.shade(Material.background, Material.Shade100)
 
@@ -46,6 +47,37 @@ Rectangle {
         refreshOutput()
     }
 
+    function deleteSelected() {
+        var nodesToDelete = []
+        for(var i in nodes) {
+            var node = nodes[i]
+            if(node.selected) {
+                nodesToDelete.push(node)
+            }
+        }
+        for(var i in nodesToDelete) {
+            var node = nodesToDelete[i]
+            deleteNode(node)
+        }
+    }
+
+    function deleteNode(node) {
+        var edgesToDelete = []
+        for(var i in edges) {
+            var edge = edges[i]
+            if(edge.to.node === node || edge.from.node === node) {
+                edgesToDelete.push(edge)
+            }
+        }
+        for(var i in edgesToDelete)  {
+            var edge = edgesToDelete[i]
+            deleteEdge(edge)
+        }
+        nodes.splice(nodes.indexOf(node), 1)
+        refreshValues()
+        node.destroy()
+    }
+
     function removeOtherEdges(myEdge) {
         var edgesToDelete = []
         for(var i in edges) {
@@ -58,6 +90,13 @@ Rectangle {
             edge = edgesToDelete[i]
             deleteEdge(edge)
         }
+    }
+
+    function deleteEdge(edge) {
+        edges.splice(edges.indexOf(edge), 1)
+        refreshValues()
+        refreshOccupation()
+        edge.destroy()
     }
 
     function createHandleBinding(handle){
@@ -89,15 +128,15 @@ Rectangle {
                         }
                     }
                     if(!found) {
-                        if(handle.value !== handle.defaultValue) {
+                        if(handle.value == handle.defaultValue) {
+                            handle.reset()
+                        } else {
                             var serializedValue = handle.value
                             if(arrayHandles[handle.identifier]) {
                                 arrayHandles[handle.identifier].push(serializedValue)
                             } else {
                                 arrayHandles[handle.identifier] = [serializedValue]
                             }
-                        } else {
-                            handle.reset()
                         }
                     }
                 } else {
@@ -105,16 +144,17 @@ Rectangle {
                     for(var j in edges) {
                         var edge = edges[j]
                         if(edge.to === handle) {
+                            console.log(handle.identifier, edge.from.node.shaderNode)
                             handle.node.shaderNode[handle.identifier] = edge.from.node.shaderNode
                             found = true
                             break
                         }
                     }
                     if(!found) {
-                        if(handle.value !== handle.defaultValue) {
-                            handle.node.shaderNode[handle.identifier] = handle.value
-                        } else {
+                        if(handle.value == handle.defaultValue) {
                             handle.reset()
+                        } else {
+                            handle.node.shaderNode[handle.identifier] = handle.value
                         }
                     }
                 }
@@ -174,11 +214,6 @@ Rectangle {
         return edge
     }
 
-    function deleteEdge(edge) {
-        edges.splice(edges.indexOf(edge), 1)
-        edge.destroy()
-    }
-
     function deselectAll() {
         for(var i in nodes) {
             var otherNode = nodes[i]
@@ -211,16 +246,6 @@ Rectangle {
             activeNode = node
             node.selected = true
         })
-        for(var i in node.inputHandles) {
-            var handle = node.inputHandles[i]
-            handle.valueChanged.connect(
-                function (handle) {
-                    return function() {
-                        handle.node.shaderNode[handle.identifier] = Qt.binding(function() {return handle.value})
-                    }
-                }(handle)
-            )
-        }
         nodes.push(node)
         return node
     }
@@ -400,5 +425,9 @@ Rectangle {
                 onClicked: deselectAll()
             }
         }
+    }
+
+    Keys.onDeletePressed: {
+        deleteSelected()
     }
 }

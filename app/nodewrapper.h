@@ -22,10 +22,13 @@ signals:
 public slots:
     void setShaderNode(ShaderNode* shaderNode);
     void resetProperty(const QString &propertyName);
+//private slots:
+//    void handlePropertyChange(const QString &text);
 private:
     ShaderNode* m_shaderNode;
     QMap<QString, QQmlAbstractBinding::Ptr> m_resetBindingHash;
     QMap<QString, QVariant> m_resetValueHash;
+//    QSignalMapper m_signalMapper;
 };
 
 #endif // NODEWRAPPER_H

@@ -2,7 +2,7 @@
 
 NodeWrapper::NodeWrapper(QObject *parent) : QObject(parent)
 {
-
+//    connect(&m_signalMapper, SIGNAL(mapped(QString)), this, SLOT(handlePropertyChange(QString)));
 }
 
 ShaderNode *NodeWrapper::shaderNode() const
@@ -31,11 +31,20 @@ void NodeWrapper::setShaderNode(ShaderNode *shaderNode)
             } else if (property.isWritable()) {
                 m_resetValueHash.insert(propertyName, property.read());
             }
+//            if(property.hasNotifySignal()) {
+//                m_signalMapper.setMapping(property.object(), propertyName);
+//                property.connectNotifySignal(&m_signalMapper, SLOT(map()));
+//            }
         }
     }
 
     emit shaderNodeChanged(shaderNode);
 }
+
+//void NodeWrapper::handlePropertyChange(const QString &text)
+//{
+//    qDebug() << text << m_shaderNode->property(text.toStdString().c_str());
+//}
 
 void NodeWrapper::resetProperty(const QString &propertyName)
 {

@@ -28,9 +28,17 @@ Item {
     width: 120
     height: 24
 
+    onValueChanged: {
+        if(occupied) {
+           return
+        }
+        node.shaderNode[identifier] = Qt.binding(function() {return value})
+    }
+
     function reset() {
         value = defaultValue
-        node.nodeWrapper.resetProperty(name)
+        node.shaderNode[identifier] = value
+//        node.nodeWrapper.resetProperty(name)
     }
 
     Plug {

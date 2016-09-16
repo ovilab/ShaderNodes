@@ -156,6 +156,7 @@ void ShaderBuilder::addUniform(ShaderNode *node, const QString &propertyName, co
     uniform.identifier = identifier;
     uniform.value = value;
     uniform.type = glslType(value);
+
     QParameter* param = new QParameter();
     param->setName(identifier);
     if(value.type() == QVariant::String) {
