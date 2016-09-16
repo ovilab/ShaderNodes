@@ -85,6 +85,10 @@ void ShaderNode::handlePropertyChange(int index)
             m_propertyTypeNames[index] = newTypeName;
             emit propertyTypeChanged();
         }
+        // Mark as dirty for all changes to QJSValues as these cannot easily be checked directly
+        if(newTypeName == "QJSValue" || oldTypeName == "QJSValue") {
+            emit markDirty();
+        }
     }
 }
 
