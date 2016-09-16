@@ -5,7 +5,7 @@ import ShaderNodes 1.0
 ShaderNode {
     id: root
 
-    property var values: [0.0]
+    property var values: [1.0]
 
     arrayProperties: ["values"]
     exportedTypeName: "Add"

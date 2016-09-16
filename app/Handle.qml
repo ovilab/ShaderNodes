@@ -22,7 +22,6 @@ Item {
     property bool arrayBased: false
     property var value
     property var defaultValue
-    property var boundValue: node.shaderNode[name]
     property string glslType
 
     width: 120
@@ -37,8 +36,7 @@ Item {
 
     function reset() {
         value = defaultValue
-        node.shaderNode[identifier] = value
-//        node.nodeWrapper.resetProperty(name)
+        node.nodeWrapper.resetProperty(name)
     }
 
     Plug {

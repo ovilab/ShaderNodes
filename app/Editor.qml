@@ -128,7 +128,7 @@ Rectangle {
                         }
                     }
                     if(!found) {
-                        if(handle.value == handle.defaultValue) {
+                        if(handle.value === handle.defaultValue) {
                             handle.reset()
                         } else {
                             var serializedValue = handle.value
@@ -144,14 +144,13 @@ Rectangle {
                     for(var j in edges) {
                         var edge = edges[j]
                         if(edge.to === handle) {
-                            console.log(handle.identifier, edge.from.node.shaderNode)
                             handle.node.shaderNode[handle.identifier] = edge.from.node.shaderNode
                             found = true
                             break
                         }
                     }
                     if(!found) {
-                        if(handle.value == handle.defaultValue) {
+                        if(handle.value === handle.defaultValue) {
                             handle.reset()
                         } else {
                             handle.node.shaderNode[handle.identifier] = handle.value
@@ -220,12 +219,6 @@ Rectangle {
             otherNode.selected = false
         }
         activeNode = null
-    }
-
-    function createBindShaderNodeToHandleValue(handle) {
-        return function() {
-            handle.node.shaderNode[handle.identifier] = Qt.binding(function() {return handle.value})
-        }
     }
 
     function createNode(source, properties) {
