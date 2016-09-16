@@ -245,6 +245,7 @@ Rectangle {
             node.selected = true
             root.forceActiveFocus()
         })
+        node.shaderNode.parent = shaderBuilderMaterial // necessary for texture nodes
         nodes.push(node)
         return node
     }

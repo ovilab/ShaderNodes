@@ -5,6 +5,7 @@
 #include <QVariant>
 #include <QColor>
 #include <QMutex>
+#include <QUrl>
 
 class QQmlEngine;
 class QJSEngine;
@@ -99,6 +100,7 @@ public:
     Q_INVOKABLE static double hsvHue(const QColor &color);
     Q_INVOKABLE static double hsvSaturation(const QColor &color);
     Q_INVOKABLE static double hsvValue(const QColor &color);
+    Q_INVOKABLE static bool fileExists(const QUrl &fileName);
 private:
     static QMutex m_nameMutex;
     static int m_nameCounter;

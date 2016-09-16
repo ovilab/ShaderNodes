@@ -2,26 +2,27 @@ import ShaderNodes 1.0
 import Qt3D.Render 2.0
 
 ShaderNode {
-    property alias source: textureImage.source
+    id: root
+    property url imageSource
     property var vector: ShaderBuilderBinding {
         property: "textureCoordinate"
     }
 //    property var vector: Qt.vector2d(0, 0)
     property var offset: Qt.vector2d(0, 0)
-
-    property var texture: Texture2D {
-        // TODO This needs to be added as a parameter in the material
+    property var _texture: Texture2D {
         id: diffuseTexture
         minificationFilter: Texture.LinearMipMapLinear
         magnificationFilter: Texture.Linear
         wrapMode {
-            x: WrapMode.Repeat
-            y: WrapMode.Repeat
+            x: WrapMode.ClampToEdge
+            y: WrapMode.ClampToEdge
         }
         generateMipMaps: true
         maximumAnisotropy: 16.0
         TextureImage {
             id: textureImage
+            // TODO: Reuse this once Qt3D doesn't crash if file doesn't exist
+            source: "qrc:/images/colorwheel.png"
         }
     }
 
@@ -29,10 +30,12 @@ ShaderNode {
 
     name: "imagetexture"
     type: "vec4"
-    result: {
-        if(glslType(texture) === "sampler2D") {
-            return "texture($texture, $(vector, vec2) + $(offset, vec2))"
+    result: "texture($_texture, $(vector, vec2) + $(offset, vec2))"
+
+    onImageSourceChanged: {
+        // TODO: Reuse this once Qt3D doesn't crash if file doesn't exist
+        if(ShaderUtils.fileExists(imageSource)) {
+            textureImage.source = imageSource
         }
-        return "$(texture, " + type + ")"
     }
 }

@@ -7,9 +7,11 @@
 #include <QJSEngine>
 #include <QQmlExpression>
 #include <QQmlEngine>
+#include <QQmlFile>
 #include <QVector2D>
 #include <QVector3D>
 #include <QVector4D>
+#include <QFileInfo>
 #include <Qt3DRender/QTexture>
 
 using Qt3DRender::QTexture2D;
@@ -179,6 +181,17 @@ double ShaderUtils::hsvSaturation(const QColor &color)
 double ShaderUtils::hsvValue(const QColor &color)
 {
     return color.valueF();
+}
+
+bool ShaderUtils::fileExists(const QUrl &fileUrl)
+{
+    QString fileName = QQmlFile::urlToLocalFileOrQrc(fileUrl);
+    QFileInfo info(fileName);
+    if(info.exists() && info.isFile()) {
+        return true;
+    } else {
+        return false;
+    }
 }
 
 QString ShaderUtils::preferredType(const QVariant &value1, const QVariant &value2)

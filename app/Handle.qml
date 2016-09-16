@@ -22,7 +22,6 @@ Item {
     property bool arrayBased: false
     property var value
     property var defaultValue
-    property string glslType
 
     width: 120
     height: 24

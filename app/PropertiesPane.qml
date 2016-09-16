@@ -4,6 +4,7 @@ import QtQuick.Layouts 1.0
 import Qt.labs.settings 1.0
 import QtGraphicalEffects 1.0
 import QtQuick.Controls 1.0 as QtControls
+import QtQuick.Dialogs 1.2
 
 import ShaderNodes 1.0
 
@@ -39,6 +40,47 @@ Pane {
                     id: floatEditComponent
                     FloatEditor {
                         handle: modelData
+                    }
+                }
+
+                Component {
+                    id: urlComponent
+                    Item {
+                        anchors {
+                            left: parent.left
+                            right: parent.right
+                        }
+                        height: textField.height
+
+                        TextField {
+                            id: textField
+                            anchors {
+                                left: parent.left
+                                right: browseButton.left
+                            }
+
+                            text: handle.value
+                            onEditingFinished: {
+                                handle.value = Qt.resolvedUrl(text)
+                            }
+                        }
+                        Button {
+                            id: browseButton
+                            anchors {
+                                right: parent.right
+                            }
+
+                            text: "..."
+                            onClicked: fileDialog.open()
+                        }
+
+                        FileDialog {
+                            id: fileDialog
+                            onAccepted: {
+                                textField.text = fileUrl
+                                handle.value = fileUrl
+                            }
+                        }
                     }
                 }
 
@@ -83,6 +125,8 @@ Pane {
                             return occupiedComponent
                         }
                         switch(ShaderUtils.variantType(handle.defaultValue)) {
+                        case ShaderUtils.Url:
+                            return urlComponent
                         case ShaderUtils.Int:
                         case ShaderUtils.Float:
                             return floatEditComponent

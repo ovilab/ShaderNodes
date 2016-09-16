@@ -69,15 +69,14 @@ Item {
             console.log(handleComponent.errorString())
             return
         }
-        var glslType = ShaderNodes.glslType(value)
+//        var glslType = ShaderNodes.glslType(value)
         var properties = {
             name: name,
             identifier: name,
             type: "input",
             node: root,
             value: value,
-            defaultValue: value,
-            glslType: glslType
+            defaultValue: value
         }
         var handle = handleComponent.createObject(inputColumn, properties)
         handle.newHandleClicked.connect(function() {
