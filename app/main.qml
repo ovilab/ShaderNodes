@@ -125,4 +125,41 @@ ApplicationWindow {
             bottom: parent.bottom
         }
     }
+
+    Rectangle {
+        id: dropRectangle
+        anchors.fill: previewScene
+
+        opacity: 0
+        color: "grey"
+
+        Label {
+            text: "Drop 3D models here"
+            anchors.centerIn: parent
+        }
+
+        DropArea {
+            id: dropArea
+            anchors.fill: parent
+            onEntered: {
+                drag.accept(Qt.CopyAction)
+            }
+            onDropped: {
+                if(drop.hasUrls) {
+                    var fileUrl = drop.urls[0]
+                    previewScene.source = fileUrl
+                }
+            }
+        }
+
+        states: [
+            State {
+                when: dropArea.containsDrag
+                PropertyChanges {
+                    target: dropRectangle
+                    opacity: 1.0
+                }
+            }
+        ]
+    }
 }

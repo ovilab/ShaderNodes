@@ -12,6 +12,7 @@ Scene3D {
     id: root
 
     property alias material: material
+    property alias source: mesh.source
 
     aspects: ["input", "logic"]
 
@@ -38,22 +39,53 @@ Scene3D {
             InputSettings {}
         ]
 
+        MouseDevice {
+            id: mouseDevice
+        }
+
+        MouseHandler {
+            id: mouseHandler
+
+            sourceDevice: mouseDevice
+            onWheel: {
+                var factor = wheel.angleDelta.y * 0.003
+                var offset = mainCamera.viewVector.times(factor)
+                mainCamera.translateWorld(offset, Camera.DontTranslateViewCenter)
+            }
+        }
+
+        Mesh {
+            id: mesh
+            onSourceChanged: {
+                torusEntity.parent = null
+            }
+        }
+
+        ShaderBuilderMaterial {
+            id: material
+        }
+
+        TorusMesh {
+            id: sphereMesh
+            minorRadius: 2.0
+            radius: 8.0
+            rings: 100
+            slices: 20
+        }
+
         Entity {
+            id: torusEntity
             components: [
                 sphereMesh,
                 material
             ]
+        }
 
-            TorusMesh {
-                id: sphereMesh
-                minorRadius: 2.0
-                radius: 8.0
-                rings: 100
-                slices: 20
-            }
-            ShaderBuilderMaterial {
-                id: material
-            }
+        Entity {
+            components: [
+                mesh,
+                material
+            ]
         }
 
         OrbitCameraController {
