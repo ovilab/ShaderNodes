@@ -15,5 +15,6 @@
         <file>images/colorwheel.png</file>
         <file>widgets/ColorEditor.qml</file>
         <file>widgets/FloatEditor.qml</file>
+        <file>widgets/Vector3DEditor.qml</file>
     </qresource>
 </RCC>

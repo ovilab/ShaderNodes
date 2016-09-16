@@ -34,10 +34,17 @@ Pane {
                     right: parent.right
                 }
                 height: loader.height
-                
+
                 Component {
                     id: floatEditComponent
                     FloatEditor {
+                        handle: modelData
+                    }
+                }
+
+                Component {
+                    id: vector3DComponent
+                    Vector3DEditor {
                         handle: modelData
                     }
                 }
@@ -82,6 +89,8 @@ Pane {
                         case ShaderUtils.Color:
                         case ShaderUtils.String:
                             return colorComponent
+                        case ShaderUtils.Vector3D:
+                            return vector3DComponent
                         default:
                             return unknownComponent
                         }

@@ -252,6 +252,9 @@ bool ShaderNode::setup(ShaderBuilder* shaderBuilder, QString tempIdentifier)
                 continue;
             }
             QVariant value = mappings[propertyName];
+            if(!value.isValid()) {
+                continue;
+            }
 
             if(value.canConvert(QVariant::List)) {
                 int i = 0;
