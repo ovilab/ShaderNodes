@@ -150,6 +150,7 @@ Rectangle {
                         var edge = edges[j]
                         if(edge.to === handle) {
                             handle.node.shaderNode[handle.identifier] = edge.from.node.shaderNode
+                            handle.node.shaderNode.markDirty() // TODO this shouldn't be necessary
                             found = true
                             break
                         }
@@ -207,8 +208,8 @@ Rectangle {
             edge.to = to
             edge.to.occupied = true
             removeOtherEdges(edge)
-            refreshOccupation()
             refreshOutput()
+            refreshOccupation()
             refreshValues()
         })
 
