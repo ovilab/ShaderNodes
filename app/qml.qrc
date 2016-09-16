@@ -13,5 +13,7 @@
         <file>SCurve.qml</file>
         <file>PropertiesPane.qml</file>
         <file>images/colorwheel.png</file>
+        <file>widgets/ColorEditor.qml</file>
+        <file>widgets/FloatEditor.qml</file>
     </qresource>
 </RCC>
