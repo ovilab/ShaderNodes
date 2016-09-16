@@ -10,7 +10,6 @@ Item {
     id: root
 
     signal dropReceived(var from, var to)
-    signal handleValueChanged()
     signal clicked
 
     property var inputHandles: []
@@ -87,10 +86,6 @@ Item {
         })
         handle.dropReceived.connect(function(from) {
             root.dropReceived(from, handle)
-        })
-        handle.valueChanged.connect(function() {
-//            shaderNode[handle.name] = handle.value
-            root.handleValueChanged()
         })
         inputHandles.push(handle)
         allHandles = inputHandles.concat(outputHandles)

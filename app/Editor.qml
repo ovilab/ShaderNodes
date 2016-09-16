@@ -96,6 +96,8 @@ Rectangle {
                             } else {
                                 arrayHandles[handle.identifier] = [serializedValue]
                             }
+                        } else {
+                            handle.reset()
                         }
                     }
                 } else {
@@ -109,7 +111,11 @@ Rectangle {
                         }
                     }
                     if(!found) {
-                        handle.node.shaderNode[handle.identifier] = createHandleBinding(handle)
+                        if(handle.value !== handle.defaultValue) {
+                            handle.node.shaderNode[handle.identifier] = handle.value
+                        } else {
+                            handle.reset()
+                        }
                     }
                 }
             }
@@ -181,6 +187,12 @@ Rectangle {
         activeNode = null
     }
 
+    function createBindShaderNodeToHandleValue(handle) {
+        return function() {
+            handle.node.shaderNode[handle.identifier] = Qt.binding(function() {return handle.value})
+        }
+    }
+
     function createNode(source, properties) {
         var nodeComponent = Qt.createComponent("Node.qml")
         if(nodeComponent.status !== Component.Ready) {
@@ -194,14 +206,21 @@ Rectangle {
             refreshOutput()
             refreshOccupation()
         })
-        node.handleValueChanged.connect(function() {
-            refreshOutput()
-        })
         node.clicked.connect(function() {
             deselectAll()
             activeNode = node
             node.selected = true
         })
+        for(var i in node.inputHandles) {
+            var handle = node.inputHandles[i]
+            handle.valueChanged.connect(
+                function (handle) {
+                    return function() {
+                        handle.node.shaderNode[handle.identifier] = Qt.binding(function() {return handle.value})
+                    }
+                }(handle)
+            )
+        }
         nodes.push(node)
         return node
     }
@@ -218,9 +237,6 @@ Rectangle {
             removeOtherEdges(edge)
             refreshOutput()
             refreshOccupation()
-        })
-        node.handleValueChanged.connect(function() {
-            refreshOutput() // TODO not needed
         })
         node.clicked.connect(function() {
             deselectAll()

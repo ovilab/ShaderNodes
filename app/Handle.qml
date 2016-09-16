@@ -22,14 +22,15 @@ Item {
     property bool arrayBased: false
     property var value
     property var defaultValue
+    property var boundValue: node.shaderNode[name]
     property string glslType
 
     width: 120
     height: 24
 
     function reset() {
+        value = defaultValue
         node.nodeWrapper.resetProperty(name)
-        value = node.shaderNode[name]
     }
 
     Plug {
