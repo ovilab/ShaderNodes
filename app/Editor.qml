@@ -62,6 +62,11 @@ Rectangle {
     }
 
     function deleteNode(node) {
+        if(node === finalNode) {
+            popup.show("Cannot delete final node")
+            return
+        }
+
         var edgesToDelete = []
         for(var i in edges) {
             var edge = edges[i]
@@ -238,6 +243,7 @@ Rectangle {
             deselectAll()
             activeNode = node
             node.selected = true
+            root.forceActiveFocus()
         })
         nodes.push(node)
         return node
@@ -365,7 +371,7 @@ Rectangle {
         addOutput(finalNode.exportedTypeName + " {")
         indentLevel += 1
 
-//        addOutput("property ShaderBuilder shaderBuilder: parent.shaderBuilder")
+        //        addOutput("property ShaderBuilder shaderBuilder: parent.shaderBuilder")
         generateHandles(finalNode)
 
         for(var i in nodes) {
@@ -388,8 +394,8 @@ Rectangle {
         indentLevel -= 1
         addOutput("}")
 
-//        var material = Qt.createQmlObject(output, root, "GeneratedMaterial")
-//        material.shaderBuilder = shaderBuilder
+        //        var material = Qt.createQmlObject(output, root, "GeneratedMaterial")
+        //        material.shaderBuilder = shaderBuilder
         shaderBuilderMaterial.fragmentColor = finalNode.shaderNode // TODO do somewhere else
 
         return true
@@ -417,6 +423,28 @@ Rectangle {
                 anchors.fill: parent
                 onClicked: deselectAll()
             }
+        }
+    }
+
+    Popup {
+        id: popup
+        x: root.width / 2 - width / 2
+        y: root.height / 2 - height / 2
+        width: 320
+        height: 240
+        modal: false
+        focus: true
+        closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
+
+        function show(message) {
+            popupLabel.text = message
+            popup.open()
+        }
+
+        Label {
+            id: popupLabel
+            anchors.centerIn: parent
+            text: "Error!"
         }
     }
 
