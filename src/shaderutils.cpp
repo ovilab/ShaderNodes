@@ -1,6 +1,7 @@
 #include "shaderutils.h"
 
 #include "shadernode.h"
+#include "shaderbuilderbinding.h"
 
 #include <QDebug>
 #include <QMetaProperty>
@@ -92,6 +93,26 @@ QString ShaderUtils::serialize(const QVariant &value)
 ShaderUtils::Type ShaderUtils::variantType(const QVariant &value)
 {
     return static_cast<ShaderUtils::Type>(value.type());
+}
+
+bool ShaderUtils::isShaderNode(const QVariant &value)
+{
+    ShaderNode* node = qvariant_cast<ShaderNode*>(value);
+    if(node) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
+bool ShaderUtils::isShaderBuilderBinding(const QVariant &value)
+{
+    ShaderBuilderBinding* builderBinding = qvariant_cast<ShaderBuilderBinding*>(value);
+    if(builderBinding) {
+        return true;
+    } else {
+        return false;
+    }
 }
 
 QString ShaderUtils::glslType(const QVariant &value)

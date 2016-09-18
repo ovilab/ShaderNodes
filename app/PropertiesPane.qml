@@ -14,6 +14,7 @@ Pane {
     id: root
 
     property Editor editor
+    readonly property bool valid: (editor && editor.activeNode)
     
     Column {
         anchors {
@@ -22,11 +23,11 @@ Pane {
         }
         
         Label {
-            text: editor.activeNode ? editor.activeNode.title : ""
+            text: valid ? editor.activeNode.title : ""
         }
         
         Repeater {
-            model: editor.activeNode ? editor.activeNode.inputHandles : undefined
+            model: valid ? editor.activeNode.inputHandles : undefined
             
             Item {
                 property Handle handle: modelData

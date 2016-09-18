@@ -1,4 +1,4 @@
-QT += qml quick qml-private
+QT += qml quick qml-private 3dcore-private 3dquick-private
 
 CONFIG += c++11
 

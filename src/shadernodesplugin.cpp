@@ -8,6 +8,7 @@
 
 #include <qqml.h>
 #include <QQmlEngine>
+#include <Qt3DQuick/private/quick3dnode_p.h>
 
 static const char* packageUri = "ShaderNodes";
 
@@ -15,7 +16,7 @@ void ShaderNodesPlugin::registerTypes(const char *uri)
 {
     Q_INIT_RESOURCE(shadernodes_imports);
     Q_ASSERT(uri == QLatin1String(packageUri));
-    qmlRegisterType<ShaderNode>(packageUri, 1, 0, "ShaderNode");
+    qmlRegisterExtendedType<ShaderNode, Qt3DCore::Quick::Quick3DNode>(packageUri, 1, 0, "ShaderNode");
     qmlRegisterType<ShaderBuilder>(packageUri, 1, 0, "ShaderBuilder");
     qmlRegisterType<ShaderOutput>(packageUri, 1, 0, "ShaderOutput");
     qmlRegisterType<ShaderBuilderBinding>(packageUri, 1, 0, "ShaderBuilderBinding");

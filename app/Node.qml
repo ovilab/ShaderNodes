@@ -79,17 +79,22 @@ Item {
             defaultValue: value
         }
         var handle = handleComponent.createObject(inputColumn, properties)
-        handle.newHandleClicked.connect(function() {
-            var newHandle = createInputHandle(name, value)
-            newHandle.arrayBased = true
-        })
         handle.dropReceived.connect(function(from) {
             root.dropReceived(from, handle)
+        })
+        handle.newHandleClicked.connect(function() {
+            addAnotherHandle(handle)
         })
         inputHandles.push(handle)
         allHandles = inputHandles.concat(outputHandles)
         updateHandleConnectionPoints()
         return handle
+    }
+
+    function addAnotherHandle(handle) {
+        var newHandle = createInputHandle(handle.name, handle.value)
+        newHandle.arrayBased = true
+        return newHandle
     }
 
     function parseNode(shaderNode) {

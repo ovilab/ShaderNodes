@@ -16,51 +16,69 @@ ApplicationWindow {
         property alias windowHeight: root.height
     }
 
-    ListView {
-        id: shaderList
+    ColumnLayout {
+        id: leftColumn
         anchors {
             left: parent.left
             top: parent.top
             bottom: parent.bottom
         }
         width: parent.width * 0.10
-        model: ListModel {
-            ListElement {name: "Add"}
-            ListElement {name: "AmbientOcclusion"}
-            ListElement {name: "Bump"}
-            ListElement {name: "Clamp"}
-            ListElement {name: "CombineRgb"}
-            ListElement {name: "Decolorize"}
-            ListElement {name: "Displacement"}
-//            ListElement {name: "Function"}
-//            ListElement {name: "Geometry"}
-            ListElement {name: "ImageTexture"}
-            ListElement {name: "Light"}
-            ListElement {name: "Mix"}
-            ListElement {name: "Multiply"}
-            ListElement {name: "Noise"}
-            ListElement {name: "NormalMap"}
-            ListElement {name: "Simplex"}
-            ListElement {name: "Sine"}
-//            ListElement {name: "Split"}
-            ListElement {name: "StandardMaterial"}
-            ListElement {name: "Subtract"}
-            ListElement {name: "Sum"}
+
+        Button {
+            id: loadButton
+            text: "Load"
+            onClicked: mainEditor.loadTree()
         }
 
-        delegate: ItemDelegate {
-            text: name
-            onClicked: {
-                editor.createNode("qrc:/ShaderNodes/" + name + ".qml", {x: 200, y: 200})
+        Button {
+            id: exportButton
+            text: "Export"
+            onClicked: mainEditor.logOutput()
+        }
+
+        ListView {
+            id: shaderList
+            Layout.fillHeight: true
+            Layout.fillWidth: true
+            model: ListModel {
+                ListElement {name: "Add"}
+                ListElement {name: "AmbientOcclusion"}
+                ListElement {name: "Bump"}
+                ListElement {name: "Clamp"}
+                ListElement {name: "CombineRgb"}
+                ListElement {name: "Decolorize"}
+                ListElement {name: "Displacement"}
+    //            ListElement {name: "Function"}
+    //            ListElement {name: "Geometry"}
+                ListElement {name: "ImageTexture"}
+                ListElement {name: "Light"}
+                ListElement {name: "Mix"}
+                ListElement {name: "Multiply"}
+                ListElement {name: "Noise"}
+                ListElement {name: "NormalMap"}
+                ListElement {name: "Simplex"}
+                ListElement {name: "Sine"}
+    //            ListElement {name: "Split"}
+                ListElement {name: "StandardMaterial"}
+                ListElement {name: "Subtract"}
+                ListElement {name: "Sum"}
+            }
+
+            delegate: ItemDelegate {
+                text: name
+                onClicked: {
+                    mainEditor.createNode("qrc:/ShaderNodes/" + name + ".qml", {x: 200, y: 200})
+                }
             }
         }
     }
 
     Editor {
-        id: editor
+        id: mainEditor
 
         anchors {
-            left: shaderList.right
+            left: leftColumn.right
             top: parent.top
             bottom: parent.bottom
         }
@@ -77,10 +95,10 @@ ApplicationWindow {
             top: parent.top
             bottom: parent.verticalCenter
             right: parent.right
-            left: editor.right
+            left: mainEditor.right
         }
 
-        editor: editor
+        editor: mainEditor
     }
 
 //    Pane {
@@ -121,7 +139,7 @@ ApplicationWindow {
         anchors {
             right: parent.right
             top: parent.verticalCenter
-            left: editor.right
+            left: mainEditor.right
             bottom: parent.bottom
         }
     }

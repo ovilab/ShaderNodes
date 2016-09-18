@@ -45,6 +45,12 @@ Rectangle {
         outputNode = nodes[2]
 
         refreshOutput()
+        shaderBuilderMaterial.fragmentColor = finalNode.shaderNode // TODO do somewhere else
+    }
+
+    function logOutput() {
+        refreshOutput()
+        console.log(output)
     }
 
     function deleteSelected() {
@@ -61,12 +67,7 @@ Rectangle {
         }
     }
 
-    function deleteNode(node) {
-        if(node === finalNode) {
-            popup.show("Cannot delete final node")
-            return
-        }
-
+    function forceDeleteNode(node) {
         var edgesToDelete = []
         for(var i in edges) {
             var edge = edges[i]
@@ -81,6 +82,14 @@ Rectangle {
         nodes.splice(nodes.indexOf(node), 1)
         refreshValues()
         node.destroy()
+    }
+
+    function deleteNode(node) {
+        if(node === finalNode) {
+            popup.show("Cannot delete final node")
+            return
+        }
+        forceDeleteNode(node)
     }
 
     function removeOtherEdges(myEdge) {
@@ -228,36 +237,30 @@ Rectangle {
     }
 
     function createNode(source, properties) {
-        var nodeComponent = Qt.createComponent("Node.qml")
-        if(nodeComponent.status !== Component.Ready) {
-            console.log(nodeComponent.errorString())
-        }
         properties.source = source
-        var node = nodeComponent.createObject(workspace, properties)
-        node.dropReceived.connect(function(from, to) {
-            var edge = createEdge(from, to)
-            removeOtherEdges(edge)
-            refreshOutput()
-            refreshOccupation()
-        })
-        node.clicked.connect(function() {
-            deselectAll()
-            activeNode = node
-            node.selected = true
-            root.forceActiveFocus()
-        })
+        var node = createNodeFromComponent(properties)
         node.shaderNode.parent = shaderBuilderMaterial // necessary for texture nodes
-        nodes.push(node)
+        finalizeCreatedNode(node)
         return node
     }
 
     function createInputNode(shaderNode, properties) {
+        properties.shaderNode = shaderNode
+        var node = createNodeFromComponent(properties)
+        finalizeCreatedNode(node)
+        return node
+    }
+
+    function createNodeFromComponent(properties) {
         var nodeComponent = Qt.createComponent("Node.qml")
         if(nodeComponent.status !== Component.Ready) {
             console.log(nodeComponent.errorString())
         }
-        properties.shaderNode = shaderNode
         var node = nodeComponent.createObject(workspace, properties)
+        return node
+    }
+
+    function finalizeCreatedNode(node) {
         node.dropReceived.connect(function(from, to) {
             var edge = createEdge(from, to)
             removeOtherEdges(edge)
@@ -270,6 +273,138 @@ Rectangle {
             node.selected = true
         })
         nodes.push(node)
+    }
+
+    function loadTree() {
+        var source = "
+import ShaderNodes 1.0
+StandardMaterial {
+//    color: mix1
+    diffuseColor: add3
+    Mix {
+        id: mix1
+        value1: shaderBuilder.inputs[0]
+        value2: shaderBuilder.inputs[2]
+    }
+    Add {
+        id: add3
+        values: [
+            shaderBuilder.inputs[0],
+            shaderBuilder.inputs[1],
+            shaderBuilder.inputs[3],
+        ]
+    }
+}
+"
+        // clear the tree
+        var nodesToDelete = nodes.slice()
+        for(var i in nodesToDelete) {
+            forceDeleteNode(nodesToDelete[i])
+        }
+
+        var object = Qt.createQmlObject(source, shaderBuilderMaterial)
+
+        var createdNodes = []
+
+        var rootNode = createNodesFromShaderNodeTree(object, createdNodes, 0, 0)
+
+        for(var i in nodes) {
+            var node = nodes[i]
+            var shaderNode = node.shaderNode
+            var inputNames = shaderNode.inputNames()
+            for(var j in inputNames) {
+                var inputHandle
+                for(var k in node.inputHandles) {
+                    var handle = node.inputHandles[k]
+                    if(handle.identifier === inputNames[j]) {
+                        inputHandle = handle
+                        break
+                    }
+                }
+                if(!inputHandle) {
+                    throw("Could not find input handle for " + inputNames[j])
+                }
+
+                var value = shaderNode[inputHandle.identifier]
+                var toExplore = []
+                if(ShaderUtils.isList(value)) {
+                    for(var k in value) {
+                        toExplore.push(value[k])
+                    }
+                } else {
+                    toExplore.push(value)
+                }
+                for(var k in toExplore) {
+                    if(inputHandle.arrayBased && k > 0) {
+                        inputHandle = node.addAnotherHandle(inputHandle)
+                    }
+
+                    var exploreValue = toExplore[k]
+                    if(ShaderUtils.isShaderNode(exploreValue)) {
+                        for(var l in nodes) {
+                            var otherNode = nodes[l]
+                            if(otherNode.shaderNode === exploreValue) {
+                                if(otherNode.outputHandles.length === 1) {
+                                    // TODO support nodes with multiple or zero output values
+                                    createEdge(otherNode.outputHandles[0], inputHandle)
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        root.finalNode = rootNode
+        shaderBuilderMaterial.fragmentColor = finalNode.shaderNode // TODO do somewhere else
+    }
+
+    function createNodesFromShaderNodeTree(shaderNode, createdNodes, level, index) {
+        if(createdNodes.indexOf(shaderNode) > -1) {
+            return
+        }
+        createdNodes.push(shaderNode)
+        console.log("Create from", shaderNode, level, index)
+        var properties = {
+            x: 1600 - level * 400,
+            y: index * 200,
+            shaderNode: shaderNode
+        }
+        var node = createNodeFromComponent(properties)
+
+        var inputNames = shaderNode.inputNames()
+        var subIndex = 0
+        for(var i in inputNames) {
+            var name = inputNames[i]
+            var value = shaderNode[inputNames[i]]
+
+            // TODO do not create if the node is part of shaderBuilder
+            // TODO do not create if this is an internal binding of the node (aka only one property needs setup)
+            // TODO do not create if this is an internal object of the node (aka default light)
+
+            var toExplore = []
+            if(ShaderUtils.isList(value)) {
+                for(var j in value) {
+                    toExplore.push(value[j])
+                }
+            } else {
+                toExplore.push(value)
+            }
+
+            for(var k in toExplore) {
+                var exploreValue = toExplore[k]
+                if(ShaderUtils.isShaderBuilderBinding(exploreValue)) {
+                    continue
+                }
+                if(ShaderUtils.isShaderNode(exploreValue)) {
+                    subIndex += 1
+                    createNodesFromShaderNodeTree(exploreValue, createdNodes, level + 1, subIndex)
+                }
+            }
+        }
+
+        finalizeCreatedNode(node)
+
         return node
     }
 
@@ -281,7 +416,7 @@ Rectangle {
         output += indent(text) + "\n"
     }
 
-    function generateHandles(node) {
+    function generateHandlesOutput(node) {
         var foundHandles = []
         var arrayHandles = {}
 
@@ -374,7 +509,7 @@ Rectangle {
         indentLevel += 1
 
         //        addOutput("property ShaderBuilder shaderBuilder: parent.shaderBuilder")
-        generateHandles(finalNode)
+        generateHandlesOutput(finalNode)
 
         for(var i in nodes) {
             var node = nodes[i]
@@ -387,7 +522,7 @@ Rectangle {
             addOutput(node.exportedTypeName + " {")
             indentLevel += 1
             addOutput("id: " + node.identifier)
-            generateHandles(node)
+            generateHandlesOutput(node)
 
             indentLevel -= 1
             addOutput("}")
@@ -398,7 +533,7 @@ Rectangle {
 
         //        var material = Qt.createQmlObject(output, root, "GeneratedMaterial")
         //        material.shaderBuilder = shaderBuilder
-        shaderBuilderMaterial.fragmentColor = finalNode.shaderNode // TODO do somewhere else
+//        shaderBuilderMaterial.fragmentColor = finalNode.shaderNode // TODO do somewhere else
 
         return true
     }

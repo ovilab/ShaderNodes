@@ -101,6 +101,8 @@ public:
     Q_INVOKABLE static double hsvSaturation(const QColor &color);
     Q_INVOKABLE static double hsvValue(const QColor &color);
     Q_INVOKABLE static bool fileExists(const QUrl &fileName);
+    Q_INVOKABLE static bool isShaderNode(const QVariant &value);
+    Q_INVOKABLE static bool isShaderBuilderBinding(const QVariant &value);
 private:
     static QMutex m_nameMutex;
     static int m_nameCounter;
