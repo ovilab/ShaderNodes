@@ -13,6 +13,8 @@ import "widgets"
 Pane {
     id: root
 
+    // TODO add possibility to change handle value type manually
+
     property Editor editor
     readonly property bool valid: (editor && editor.activeNode)
     
@@ -125,7 +127,7 @@ Pane {
                         if(handle.occupied) {
                             return occupiedComponent
                         }
-                        switch(ShaderUtils.variantType(handle.defaultValue)) {
+                        switch(ShaderUtils.variantType(handle.value)) {
                         case ShaderUtils.Url:
                             return urlComponent
                         case ShaderUtils.Int:

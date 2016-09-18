@@ -25,6 +25,7 @@ Item {
 
     property alias source: loader.source
     property ShaderNode shaderNode: loader.item ? loader.item : null
+    property ShaderNode originalNode // used when loading
     property alias nodeWrapper: nodeWrapper
 
     width: 360

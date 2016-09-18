@@ -279,19 +279,17 @@ Rectangle {
         var source = "
 import ShaderNodes 1.0
 StandardMaterial {
-//    color: mix1
     diffuseColor: add3
     Mix {
         id: mix1
         value1: shaderBuilder.inputs[0]
-        value2: shaderBuilder.inputs[2]
+        value2: Qt.vector3d(1.0, 0.0, 0.0)
     }
     Add {
         id: add3
         values: [
             shaderBuilder.inputs[0],
-            shaderBuilder.inputs[1],
-            shaderBuilder.inputs[3],
+            mix1,
         ]
     }
 }
@@ -310,8 +308,8 @@ StandardMaterial {
 
         for(var i in nodes) {
             var node = nodes[i]
-            var shaderNode = node.shaderNode
-            var inputNames = shaderNode.inputNames()
+            var originalNode = node.originalNode
+            var inputNames = originalNode.inputNames()
             for(var j in inputNames) {
                 var inputHandle
                 for(var k in node.inputHandles) {
@@ -325,7 +323,7 @@ StandardMaterial {
                     throw("Could not find input handle for " + inputNames[j])
                 }
 
-                var value = shaderNode[inputHandle.identifier]
+                var value = originalNode[inputHandle.identifier]
                 var toExplore = []
                 if(ShaderUtils.isList(value)) {
                     for(var k in value) {
@@ -343,13 +341,15 @@ StandardMaterial {
                     if(ShaderUtils.isShaderNode(exploreValue)) {
                         for(var l in nodes) {
                             var otherNode = nodes[l]
-                            if(otherNode.shaderNode === exploreValue) {
+                            if(otherNode.originalNode === exploreValue) {
                                 if(otherNode.outputHandles.length === 1) {
                                     // TODO support nodes with multiple or zero output values
                                     createEdge(otherNode.outputHandles[0], inputHandle)
                                 }
                             }
                         }
+                    } else {
+                        inputHandle.value = originalNode[inputHandle.identifier]
                     }
                 }
             }
@@ -368,8 +368,14 @@ StandardMaterial {
         var properties = {
             x: 1600 - level * 400,
             y: index * 200,
-            shaderNode: shaderNode
+            originalNode: shaderNode
         }
+        if(shaderNode.exportedTypeName) {
+            properties.source = "/ShaderNodes/" + shaderNode.exportedTypeName  + ".qml"
+        } else {
+            properties.shaderNode = shaderNode
+        }
+
         var node = createNodeFromComponent(properties)
 
         var inputNames = shaderNode.inputNames()
