@@ -1,4 +1,4 @@
-#version 330
+#version 130
 #pragma shadernodes header
 
 in highp vec3 position;

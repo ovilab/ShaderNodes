@@ -1,4 +1,4 @@
-#version 330
+#version 130
 #pragma shadernodes header
 
 in highp vec3 vertexPosition;
@@ -22,6 +22,7 @@ void main() {
     texCoord = vertexTexCoord;
     position = vec3(modelMatrix*vec4(vertexPosition, 1.0));
 
+    // TODO something is wrong with tangent in GLSL 1.30
     tangent = normalize(modelNormalMatrix * vertexTangent.xyz);
     normal = normalize(modelNormalMatrix * vertexNormal.xyz);
     binormal = normalize(cross(normal, tangent));
