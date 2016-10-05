@@ -50,5 +50,8 @@ ShaderNode {
         return output
     }
 
-    headerFile: "qrc:/ShaderNodes/shaders/standard_material.glsl"
+    headerFiles: [
+        "qrc:/ShaderNodes/shaders/light.glsl",
+        "qrc:/ShaderNodes/shaders/standard_material.glsl"
+    ]
 }

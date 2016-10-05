@@ -465,6 +465,24 @@ void ShaderNode::setExportedTypeName(QString exportedTypeName)
     emit exportedTypeNameChanged(exportedTypeName);
 }
 
+void ShaderNode::setHeaderFiles(QList<QUrl> headerFiles)
+{
+    if (m_headerFiles == headerFiles)
+        return;
+
+    QString headerData = "";
+    for(auto& headerFile : headerFiles) {
+        QString fileName = QQmlFile::urlToLocalFileOrQrc(headerFile);
+        QFile file(fileName);
+        file.open(QFile::ReadOnly);
+        headerData += file.readAll() + "\n";
+    }
+    setHeader(headerData);
+
+    m_headerFiles = headerFiles;
+    emit headerFilesChanged(headerFiles);
+}
+
 ShaderBuilder *ShaderNode::shaderBuilder() const
 {
     return m_shaderBuilder;

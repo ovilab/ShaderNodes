@@ -1,3 +1,6 @@
+#ifndef SHADER_NODES_STANDARD_MATERIAL_GLSL
+#define SHADER_NODES_STANDARD_MATERIAL_GLSL
+
 highp vec3 standardMaterialLight(highp Light light, highp vec3 vnormal, highp vec3 vertexPosition, highp vec3 cameraPosition,
                         highp vec3 ambientColor, highp vec3 diffuseColor, highp vec3 specularColor,
                         highp float ambientIntensity, highp float diffuseIntensity, highp float specularIntensity,
@@ -33,3 +36,5 @@ highp vec3 standardMaterialLight(highp Light light, highp vec3 vnormal, highp ve
    /* RETURN GAMMA CORRECTED COMBINED */
    return gamma(lightVector, light.gamma);
 }
+
+#endif
