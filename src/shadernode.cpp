@@ -198,7 +198,6 @@ bool ShaderNode::setup(ShaderBuilder* shaderBuilder, QString tempIdentifier)
         QVariant value = metaProperty.read(this);
 
         if(!value.isValid()) {
-            qCritical() << "Warning:" << propertyName << "on node" << name() << "has invalid QVariant value. Assuming float(0.0).";
             value = QVariant(0.0);
         }
 
