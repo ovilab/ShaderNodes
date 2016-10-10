@@ -160,10 +160,12 @@ void ShaderBuilder::addUniform(ShaderNode *node, const QString &propertyName, co
     QParameter* param = new QParameter();
     param->setName(identifier);
     if(value.type() == QVariant::String) {
+        // TODO use property value to color conversions as found in Qt sources
         param->setValue(QColor(value.toString()));
     } else {
         param->setValue(value);
     }
+
     uniform.parameter = param;
     m_uniforms.append(uniform);
 

@@ -18,3 +18,4 @@ uniform highp mat4 modelViewProjectionMatrix;
 void main(void) {
 #pragma shadernodes body
 }
+

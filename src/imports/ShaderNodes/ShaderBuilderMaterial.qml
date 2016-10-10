@@ -25,6 +25,12 @@ Material {
                     value: "forward"
                 }
             ]
+//            graphicsApiFilter {
+//                api: GraphicsApiFilter.OpenGL
+//                profile: GraphicsApiFilter.CompatibilityProfile
+//                majorVersion: 4
+//                minorVersion: 0
+//            }
             renderPasses: RenderPass {
                 shaderProgram: ShaderProgram {
                     vertexShaderCode: vertexShaderBuilder.finalShader
@@ -122,7 +128,7 @@ Material {
                 id: _fragmentColor
                 type: "vec4"
                 name: "fragColor"
-                value: Add {}
+                value: Add {} // TODO could just be empty?
             }
         ]
     }
