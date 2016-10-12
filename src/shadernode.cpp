@@ -11,7 +11,7 @@
 #include <QQmlFile>
 #include <QFile>
 
-const QStringList builtinNames = QStringList{"objectName","parent","enabled","name","type","result","source","header","identifier","headerFile","requirement","dependencies","data","childNodes","exportedTypeName","arrayProperties"};
+const QStringList builtinNames = QStringList{"objectName","parent","enabled","name","type","result","source","header","identifier","headerFile","requirement","dependencies","data","childNodes","exportedTypeName","arrayProperties", "headerFiles"};
 
 ShaderNode::ShaderNode(Qt3DCore::QNode *parent)
     : Qt3DCore::QNode(parent)

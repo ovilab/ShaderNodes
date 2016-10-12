@@ -33,14 +33,14 @@ Rectangle {
         }
 
         var mix = createNode("/ShaderNodes/Mix.qml", {x: 400, y: 10})
-        var standardMaterial = createNode("/ShaderNodes/StandardMaterial.qml", {x: 800, y: 400})
+        var standardMaterial = createNode("/ShaderNodes/Mix.qml", {x: 800, y: 400})
 
         finalNode = standardMaterial
         activeNode = finalNode
 
         createEdge(nodes[0].outputHandles[0], mix.inputHandles[0])
         createEdge(nodes[2].outputHandles[0], mix.inputHandles[1])
-        createEdge(mix.outputHandles[0], standardMaterial.inputHandles[4])
+        createEdge(mix.outputHandles[0], standardMaterial.inputHandles[1])
 
         outputNode = nodes[2]
 
