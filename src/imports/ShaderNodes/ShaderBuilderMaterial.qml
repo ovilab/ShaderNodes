@@ -18,13 +18,16 @@ Material {
 
     effect: Effect {
         techniques: Technique {
-            filterKeys: [
-                FilterKey {
-                    id: forward
-                    name: "renderingStyle"
-                    value: "forward"
-                }
-            ]
+            graphicsApiFilter {
+                api: GraphicsApiFilter.OpenGL
+                profile: GraphicsApiFilter.CoreProfile
+                majorVersion: 3
+                minorVersion: 2
+            }
+            filterKeys: FilterKey {
+                name: "renderingStyle"
+                value: "forward"
+            }
             renderPasses: RenderPass {
                 shaderProgram: ShaderProgram {
                     vertexShaderCode: vertexShaderBuilder.finalShader
@@ -122,7 +125,7 @@ Material {
                 id: _fragmentColor
                 type: "vec4"
                 name: "fragColor"
-                value: Add {}
+                value: Add {} // TODO could just be empty?
             }
         ]
     }

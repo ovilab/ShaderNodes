@@ -79,6 +79,13 @@ void ShaderNode::handlePropertyChange(int index)
     if(m_propertyTypeNames.contains(index) && metaObject()->propertyCount() > index) {
         QMetaProperty metaProperty = metaObject()->property(index);
         QVariant value = metaProperty.read(this);
+        if(value.type() == QVariant::Int) {
+            // Var values may be parsed as int by QML
+            // but we need to treat them as floating point numbers
+            // TODO make this into a new type to make sure we cannot mistakenly forget to convert it
+            // One option is to use phantom types: https://youtu.be/ojZbFIQSdl8?t=24m7s
+            value = QVariant(double(value.toInt()));
+        }
         QString oldTypeName = m_propertyTypeNames[index];
         QString newTypeName = value.typeName();
         if(oldTypeName != newTypeName) {
@@ -198,8 +205,13 @@ bool ShaderNode::setup(ShaderBuilder* shaderBuilder, QString tempIdentifier)
         QVariant value = metaProperty.read(this);
 
         if(!value.isValid()) {
-            qCritical() << "Warning:" << propertyName << "on node" << name() << "has invalid QVariant value. Assuming float(0.0).";
             value = QVariant(0.0);
+        }
+
+        if(value.type() == QVariant::Int) {
+            // Var values may be parsed as int by QML
+            // but we need to treat them as floating point numbers
+            value = QVariant(double(value.toInt()));
         }
 
         m_propertyTypeNames[i] = value.typeName();
@@ -463,6 +475,24 @@ void ShaderNode::setExportedTypeName(QString exportedTypeName)
 
     m_exportedTypeName = exportedTypeName;
     emit exportedTypeNameChanged(exportedTypeName);
+}
+
+void ShaderNode::setHeaderFiles(QList<QUrl> headerFiles)
+{
+    if (m_headerFiles == headerFiles)
+        return;
+
+    QString headerData = "";
+    for(auto& headerFile : headerFiles) {
+        QString fileName = QQmlFile::urlToLocalFileOrQrc(headerFile);
+        QFile file(fileName);
+        file.open(QFile::ReadOnly);
+        headerData += file.readAll() + "\n";
+    }
+    setHeader(headerData);
+
+    m_headerFiles = headerFiles;
+    emit headerFilesChanged(headerFiles);
 }
 
 ShaderBuilder *ShaderNode::shaderBuilder() const

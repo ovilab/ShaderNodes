@@ -1,3 +1,6 @@
+#ifndef SHADER_NODES_LIGHT_GLSL
+#define SHADER_NODES_LIGHT_GLSL
+
 struct Light {
     highp vec3 color;
     highp float strength;
@@ -15,3 +18,5 @@ highp float attenuation(highp Light light, highp vec3 vertexPosition) {
 highp vec3 gamma(highp vec3 color, highp float gamma) {
     return pow(color, vec3(1.0/gamma));
 }
+
+#endif

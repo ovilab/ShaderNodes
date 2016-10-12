@@ -1,4 +1,4 @@
-QT *= 3dquick 3drender 3dcore 3dinput 3dlogic
+QT *= 3dquick 3drender 3dcore 3dinput 3dlogic qml-private 3dcore-private 3dquick-private
 
 INCLUDEPATH += $$PWD/src
 

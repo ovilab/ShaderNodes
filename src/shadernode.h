@@ -23,6 +23,7 @@ class ShaderNode : public Qt3DCore::QNode
     Q_PROPERTY(QString header READ header WRITE setHeader NOTIFY headerChanged)
     Q_PROPERTY(QString identifier READ identifier NOTIFY identifierChanged)
     Q_PROPERTY(QUrl headerFile READ headerFile WRITE setHeaderFile NOTIFY headerFileChanged)
+    Q_PROPERTY(QList<QUrl> headerFiles READ headerFiles WRITE setHeaderFiles NOTIFY headerFilesChanged)
     Q_PROPERTY(bool requirement READ requirement WRITE setRequirement NOTIFY requirementChanged)
     Q_PROPERTY(QQmlListProperty<ShaderNode> dependencies READ dependencies)
     Q_PROPERTY(QString exportedTypeName READ exportedTypeName WRITE setExportedTypeName NOTIFY exportedTypeNameChanged)
@@ -68,6 +69,11 @@ public:
         return m_arrayProperties;
     }
 
+    QList<QUrl> headerFiles() const
+    {
+        return m_headerFiles;
+    }
+
 signals:
     void nameChanged(QString name);
     void typeChanged(QString type);
@@ -81,6 +87,8 @@ signals:
     void exportedTypeNameChanged(QString exportedTypeName);
     void arrayPropertiesChanged(QStringList arrayProperties);
     void markDirty();
+
+    void headerFilesChanged(QList<QUrl> headerFiles);
 
 public slots:
     void setName(QString name);
@@ -100,6 +108,8 @@ public slots:
         m_arrayProperties = arrayProperties;
         emit arrayPropertiesChanged(arrayProperties);
     }
+
+    void setHeaderFiles(QList<QUrl> headerFiles);
 
 protected: // TODO make private
     mutable bool m_hasGeneratedHeader = false;
@@ -132,6 +142,7 @@ private:
     QString generateUniformName(const QString &propertyName);
     QString createUniform(const QString &propertyName, const QVariant &value);
     QStringList m_arrayProperties;
+    QList<QUrl> m_headerFiles;
 };
 
 #endif // SHADERNODE_H

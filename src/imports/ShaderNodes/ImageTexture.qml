@@ -21,8 +21,8 @@ ShaderNode {
         maximumAnisotropy: 16.0
         TextureImage {
             id: textureImage
-            // TODO: Reuse this once Qt3D doesn't crash if file doesn't exist
-            source: "qrc:/images/colorwheel.png"
+            // TODO: Remove this once Qt3D doesn't crash if file doesn't exist
+            source: "qrc:/ShaderNodes/images/empty.png"
         }
     }
 
