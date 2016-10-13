@@ -4,7 +4,7 @@
 highp vec3 standardMaterialLight(highp Light light, highp vec3 vnormal, highp vec3 vertexPosition, highp vec3 cameraPosition,
                         highp vec3 ambientColor, highp vec3 diffuseColor, highp vec3 specularColor,
                         highp float ambientIntensity, highp float diffuseIntensity, highp float specularIntensity,
-                        highp float hardness) {
+                        highp float hardness, highp float attenuationOffset) {
     highp vec3 normal = normalize(vnormal); // IMPORTANT: Do not remove
     // this because the normal is no longer normalized due to
     // interpolation on fragment shader
@@ -13,7 +13,7 @@ highp vec3 standardMaterialLight(highp Light light, highp vec3 vnormal, highp ve
     highp vec3 lightPosition = light.position;
 
     highp vec3 surfaceToLight = normalize(lightPosition - vertexPosition);
-    highp float attenuationFactor = attenuation(light, vertexPosition);
+    highp float attenuationFactor = attenuation(light, vertexPosition, attenuationOffset);
 
     highp vec3 surfaceToCamera = normalize(cameraPosition - vertexPosition);
 
