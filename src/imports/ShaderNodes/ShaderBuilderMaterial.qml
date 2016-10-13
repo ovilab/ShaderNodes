@@ -186,10 +186,7 @@ void main()
                 id: _fragmentColor
                 type: "vec4"
                 name: "fragColor"
-                value: Mix {
-                    value1: normal
-                    value2: normal
-                }
+                value: "purple"
             }
         ]
     }
