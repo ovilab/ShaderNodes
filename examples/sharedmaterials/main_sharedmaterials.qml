@@ -63,16 +63,15 @@ ApplicationWindow {
                     Material {
                         id: material
 
-                        effect: effect
+                        effect: builderEffect
 
                         parameters: [
                             Parameter { name: param.name; value: index * 0.1 }
                         ]
 
-                        ShaderBuilderEffect {
-                            id: effect
-                            fragmentColor: Parameter { id: param; value: 1.0 }
+                        ParameterListBinding {
                             material: material
+                            shaderBuilder: builderEffect.fragmentShaderBuilder
                         }
                     }
 
@@ -81,6 +80,11 @@ ApplicationWindow {
                         translation: Qt.vector3d(index, 0, 0)
                     }
                 }
+            }
+
+            ShaderBuilderEffect {
+                id: builderEffect
+                fragmentColor: Parameter { id: param; value: 1.0 }
             }
 
             SphereMesh {id: mesh}

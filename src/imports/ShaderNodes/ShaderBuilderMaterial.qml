@@ -8,7 +8,6 @@ import QtQuick 2.0 as QQ2
 import QtQuick.Scene3D 2.0
 
 Material {
-    id: root
     property alias fragmentColor: shaderBuilderEffect.fragmentColor
     property alias vertexPosition: shaderBuilderEffect.vertexPosition
 
@@ -17,6 +16,7 @@ Material {
 
     effect: ShaderBuilderEffect {
         id: shaderBuilderEffect
-        material: root
     }
+
+    // TODO add ParameterBinding
 }

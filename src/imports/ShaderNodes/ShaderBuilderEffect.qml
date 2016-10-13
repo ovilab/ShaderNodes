@@ -15,8 +15,6 @@ Effect {
     property alias fragmentColor: _fragmentColor.value
     property alias vertexPosition: _position.value
 
-    property Material material
-
     QQ2.Component.onCompleted: console.log("Created effect")
 
     techniques: [
@@ -116,7 +114,6 @@ void main()
         }
 
         shaderType: ShaderBuilder.Fragment
-        material: root.material
 
         sourceFile: "qrc:/ShaderNodes/shaders/gl3/shader_builder_material.vert"
 
@@ -140,7 +137,6 @@ void main()
         property alias textureCoordinate: textureCoordinate
 
         shaderType: ShaderBuilder.Fragment
-        material: root.material
 
         sourceFile: "qrc:/ShaderNodes/shaders/gl3/shader_builder_material.frag"
 

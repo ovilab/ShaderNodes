@@ -1,5 +1,6 @@
 #include "shadernodesplugin.h"
 
+#include "parameterlistbinding.h"
 #include "shaderbuilder.h"
 #include "shaderbuilderbinding.h"
 #include "shadernode.h"
@@ -20,6 +21,7 @@ void ShaderNodesPlugin::registerTypes(const char *uri)
     qmlRegisterType<ShaderBuilder>(packageUri, 1, 0, "ShaderBuilder");
     qmlRegisterType<ShaderOutput>(packageUri, 1, 0, "ShaderOutput");
     qmlRegisterType<ShaderBuilderBinding>(packageUri, 1, 0, "ShaderBuilderBinding");
+    qmlRegisterType<ParameterListBinding>(packageUri, 1, 0, "ParameterListBinding");
 
     qmlRegisterSingletonType<ShaderUtils>(packageUri, 1, 0, "ShaderUtils", &ShaderUtils::qmlInstance);
 }

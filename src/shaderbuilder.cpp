@@ -27,17 +27,16 @@ ShaderBuilder::~ShaderBuilder()
 
 void ShaderBuilder::clear()
 {
+    emit clearBegin();
+
     for(QSignalMapper *mapper : m_signalMappers) {
         disconnect(this, 0, mapper, SLOT(map()));
         disconnect(mapper, SIGNAL(mapped(int)), this, SLOT(updateUniform(int)));
         delete mapper;
     }
     m_signalMappers.clear();
-    if(m_material) {
-        for(UniformValue &uniformValue : m_uniforms) {
-            m_material->removeParameter(uniformValue.parameter);
-            delete uniformValue.parameter;
-        }
+    for(UniformValue &uniformValue : m_uniforms) {
+//        delete uniformValue.parameter; // TODO causes segfault on exit, but why? Are params deleted by the material?
     }
     m_uniforms.clear();
     m_finalShader = "";
@@ -190,11 +189,6 @@ ShaderBuilder::ShaderType ShaderBuilder::shaderType() const
     return m_shaderType;
 }
 
-QMaterial *ShaderBuilder::material() const
-{
-    return m_material;
-}
-
 void ShaderBuilder::rebuildShader()
 {
     clear();
@@ -258,13 +252,9 @@ void ShaderBuilder::rebuildShader()
         value->reset();
     }
 
-    if(m_material) {
-        for(UniformValue &uniformValue : m_uniforms) {
-            m_material->addParameter(uniformValue.parameter);
-        }
-    }
-
     m_finalShader = contents;
+
+    emit buildFinished();
 }
 
 void ShaderBuilder::updateUniform(int i)
@@ -309,16 +299,6 @@ void ShaderBuilder::setShaderType(ShaderBuilder::ShaderType shaderType)
     m_shaderType = shaderType;
     markDirty();
     emit shaderTypeChanged(shaderType);
-}
-
-void ShaderBuilder::setMaterial(QMaterial *material)
-{
-    if (m_material == material)
-        return;
-
-    m_material = material;
-    markDirty();
-    emit materialChanged(material);
 }
 
 void ShaderBuilder::setSource(QString source)

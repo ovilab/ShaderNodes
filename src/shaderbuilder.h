@@ -37,7 +37,6 @@ class ShaderBuilder : public Qt3DCore::QNode
     Q_PROPERTY(QQmlListProperty<ShaderNode> inputs READ inputs CONSTANT)
     Q_PROPERTY(QQmlListProperty<ShaderOutput> outputs READ outputs CONSTANT)
     Q_PROPERTY(ShaderType shaderType READ shaderType WRITE setShaderType NOTIFY shaderTypeChanged)
-    Q_PROPERTY(QMaterial* material READ material WRITE setMaterial NOTIFY materialChanged)
 
 public:
     explicit ShaderBuilder(QNode *parent = 0);
@@ -65,7 +64,6 @@ public:
     };
 
     ShaderType shaderType() const;
-    QMaterial *material() const;
 
 signals:
     void sourceChanged(QString source);
@@ -74,7 +72,8 @@ signals:
 
     void sourceFileChanged(QUrl sourceFile);
     void shaderTypeChanged(ShaderType shaderType);
-    void materialChanged(QMaterial* material);
+    void clearBegin();
+    void buildFinished();
 
 public slots:
     void rebuildShader();
@@ -84,7 +83,6 @@ public slots:
 
     void setSourceFile(QUrl sourceFile);
     void setShaderType(ShaderType shaderType);
-    void setMaterial(QMaterial* material);
 
 private:
     static void appendOutput(QQmlListProperty<ShaderOutput> *list, ShaderOutput *output);
@@ -107,13 +105,13 @@ private:
     QList<QSignalMapper*> m_signalMappers;
     QUrl m_sourceFile;
     ShaderType m_shaderType = ShaderType::Vertex;
-    QMaterial* m_material = nullptr;
-    QList<QParameter*> m_parameters;
     QString m_finalShader;
     bool m_dirty = true;
 
 public:
     QList<QPair<QString, QString>> m_parameterPlaceholders;
+
+    friend class ParameterListBinding;
 };
 
 #endif // SHADERBUILDER_H
