@@ -14,7 +14,7 @@ Material {
     property alias vertexPosition: _position.value
 
     property alias vertex: vertexShaderBuilder
-    property alias fragment: shaderBuilder
+    property alias fragment: fragmentShaderBuilder
 
     parameters: [
         Parameter { id:posMin; name: "posMin"; value: 0.0 },
@@ -27,7 +27,7 @@ Material {
                     api: GraphicsApiFilter.OpenGL
                     profile: GraphicsApiFilter.CoreProfile
                     majorVersion: 3
-                minorVersion: 3
+                    minorVersion: 3
                 }
                 filterKeys: FilterKey {
                     name: "renderingStyle"
@@ -36,7 +36,7 @@ Material {
                 renderPasses: RenderPass {
                     shaderProgram: ShaderProgram {
                         vertexShaderCode: vertexShaderBuilder.finalShader
-                        fragmentShaderCode: shaderBuilder.finalShader
+                        fragmentShaderCode: fragmentShaderBuilder.finalShader
                     }
                 }
             },
@@ -132,7 +132,7 @@ void main()
         ]
     }
     ShaderBuilder {
-        id: shaderBuilder
+        id: fragmentShaderBuilder
 
         // inputs
         property alias position: position
@@ -146,7 +146,7 @@ void main()
 
         sourceFile: "qrc:/ShaderNodes/shaders/gl3/shader_builder_material.frag"
 
-        //        onFinalShaderChanged: console.log(finalShader)
+        onFinalShaderChanged: console.log(finalShader)
 
         inputs: [
             ShaderNode {
@@ -186,7 +186,10 @@ void main()
                 id: _fragmentColor
                 type: "vec4"
                 name: "fragColor"
-                value: Add {} // TODO could just be empty?
+                value: Mix {
+                    value1: normal
+                    value2: normal
+                }
             }
         ]
     }
