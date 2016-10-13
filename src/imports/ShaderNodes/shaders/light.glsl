@@ -9,8 +9,8 @@ struct Light {
     highp float gamma;
 };
 
-highp float attenuation(highp Light light, highp vec3 vertexPosition) {
-    highp float distanceToLight = distance(vertexPosition, light.position);
+highp float attenuation(highp Light light, highp vec3 vertexPosition, highp float attenuationOffset) {
+    highp float distanceToLight = distance(vertexPosition, light.position) - attenuationOffset;
     highp float attenuationFactor = 1.0 / (1.0 + light.attenuation * 0.0001 * distanceToLight * distanceToLight);
     return attenuationFactor;
 }
