@@ -10,6 +10,7 @@
 #include <QSignalMapper>
 #include <QQmlFile>
 #include <QFile>
+#include <Qt3DRender/QParameter>
 
 const QStringList builtinNames = QStringList{"objectName","parent","enabled","name","type","result","source","header","identifier","headerFile","requirement","dependencies","data","childNodes","exportedTypeName","arrayProperties", "headerFiles"};
 
@@ -331,6 +332,7 @@ bool ShaderNode::setup(ShaderBuilder* shaderBuilder, QString tempIdentifier)
             }
 
             ShaderNode *node = qvariant_cast<ShaderNode*>(value);
+            QParameter* parameter = qvariant_cast<QParameter*>(value);
 
             QString targetIdentifier;
             QString sourceType;
@@ -341,6 +343,11 @@ bool ShaderNode::setup(ShaderBuilder* shaderBuilder, QString tempIdentifier)
                 }
                 targetIdentifier = node->identifier();
                 sourceType = node->type();
+            } else if(parameter) {
+                targetIdentifier = QString("parameter") + "_" + propertyNameNoUnderscores + "_" + ShaderUtils::generateName();
+                parameter->setName(targetIdentifier);
+                sourceType = glslType(value);
+                shaderBuilder->m_parameterPlaceholders.append({sourceType, targetIdentifier});
             } else {
                 targetIdentifier = createUniform(propertyName, value);
                 sourceType = glslType(value);

@@ -13,9 +13,11 @@
 #include <QVector3D>
 #include <QVector4D>
 #include <QFileInfo>
+#include <Qt3DRender/QParameter>
 #include <Qt3DRender/QTexture>
 
 using Qt3DRender::QTexture2D;
+using Qt3DRender::QParameter;
 
 int ShaderUtils::m_nameCounter = 0;
 QMutex ShaderUtils::m_nameMutex;
@@ -125,26 +127,14 @@ QString ShaderUtils::glslType(const QVariant &value)
     if(texture) {
         return "sampler2D";
     }
+    QParameter *parameter = qvariant_cast<QParameter*>(value);
+    if(parameter) {
+        return glslType(parameter->value());
+    }
 
     QString typeName = value.typeName();
     if(typeName == "QQmlListReference") {
-//        QQmlListReference list = qvariant_cast<QQmlListReference>(value);
-//        qDebug() << "QQmlListReference encountered, not possible to determine type.";
-//        const QMetaObject* metaObject = list.listElementType();
-//        for(int i = 0; i < metaObject->propertyCount(); i++) {
-//            qDebug() << metaObject->property(i).name();
-//        }
-//        qDebug() << "Constructor count:" << metaObject->constructorCount();
-        return "list";
-//        for(int i = 0; i < list.count(); i++) {
-//            QObject* listObject = list.at(i);
-//            ShaderNode *node = qobject_cast<ShaderNode*>(listObject);
-//            if(!node) {
-//                qWarning() << "ERROR: Could not convert listed object to ShaderNode:" << listObject;
-//                return "invalid";
-//            }
-//            return node->type();
-//        }
+        return "_invalid_aka_qml_list_";
     }
     if(value.canConvert(QVariant::List)) {
         int highestComponentCount = 0;

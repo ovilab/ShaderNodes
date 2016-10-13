@@ -218,6 +218,11 @@ void ShaderBuilder::rebuildShader()
     for(const UniformValue &uniform : m_uniforms) {
         header += "uniform highp " + uniform.type + " " + uniform.identifier + ";\n";
     }
+    header += "\n// ------         parameters        ------\n\n";
+    for(const auto& param : m_parameterPlaceholders) {
+        qDebug() << param.first << param.second;
+        header += "uniform highp " + param.first + " " + param.second + ";\n";
+    }
     header += "\n// ------   end generated header   ------\n\n";
 
     QString body = "";

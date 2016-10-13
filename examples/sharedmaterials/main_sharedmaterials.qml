@@ -24,8 +24,6 @@ ApplicationWindow {
     Scene3D {
         id: root
 
-        property var woop: slider.value
-
         anchors.fill: parent
 
         aspects: ["logic", "input"]
@@ -54,45 +52,55 @@ ApplicationWindow {
                 camera: mainCamera
             }
 
-            Entity {
-                components: [
-                    mesh,
-//                    transform,
-                    material
-                ]
+            NodeInstantiator {
+                model: 10
+                Entity {
+                    components: [
+                        mesh,
+                        transform1,
+                        material
+                    ]
+                    Material {
+                        id: material
+
+                        effect: effect
+
+                        parameters: [
+                            Parameter { name: param.name; value: index * 0.1 }
+                        ]
+
+                        ShaderBuilderEffect {
+                            id: effect
+                            fragmentColor: Parameter { id: param; value: 1.0 }
+                            material: material
+                        }
+                    }
+
+                    Transform {
+                        id: transform1
+                        translation: Qt.vector3d(index, 0, 0)
+                    }
+                }
             }
+
             SphereMesh {id: mesh}
-            Transform {
-                id: transform
-                translation: Qt.vector3d(-2, 0, 0)
-            }
-            ShaderBuilderMaterial {
-                id: material
-//                fragmentColor: "red"
-//                ColorAnimation on fragmentColor {
-//                    to: "yellow"
-//                    duration: 10000
+
+//            PhongMaterial {
+//                id: material
+//                diffuse: "red"
+//            }
+
+//            Entity {
+//                components: [
+//                    mesh,
+//                    transform2,
+//                    material
+//                ]
+//                Transform {
+//                    id: transform2
+//                    translation: Qt.vector3d(2, 0, 0)
 //                }
-                fragmentColor: root.woop
-//                NumberAnimation on fragmentColor {
-//                    to: 1.0
-//                    duration: 5000
-//                }
-            }
-
-
-            PhongMaterial {
-                id: material2
-                diffuse: Qt.rgba(root.woop, 0.0, 0.0, 1.0)
-
-//                ColorAnimation on diffuse {
-//                    to: "yellow"
-//                    duration: 10000
-//                }
-
-//                        fragmentColor: "red"
-            }
-
+//            }
         }
     }
 
@@ -103,10 +111,6 @@ ApplicationWindow {
             maximumValue: 1.0
             value: 0.5
             width: 300
-        }
-
-        Button {
-            onClicked: root.woop = "blue"
         }
     }
 }

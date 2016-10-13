@@ -111,6 +111,9 @@ private:
     QList<QParameter*> m_parameters;
     QString m_finalShader;
     bool m_dirty = true;
+
+public:
+    QList<QPair<QString, QString>> m_parameterPlaceholders;
 };
 
 #endif // SHADERBUILDER_H

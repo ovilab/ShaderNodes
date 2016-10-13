@@ -37,5 +37,6 @@
         <file>ShaderNodes/ShaderNodes.qml</file>
         <file>ShaderNodes/CombineRgb.qml</file>
         <file>ShaderNodes/images/empty.png</file>
+        <file>ShaderNodes/ShaderBuilderEffect.qml</file>
     </qresource>
 </RCC>

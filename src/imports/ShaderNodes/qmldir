@@ -22,6 +22,7 @@ Simplex 1.0 Simplex.qml
 Sine 1.0 Sine.qml
 Split 1.0 Split.qml
 ShaderBuilderMaterial 1.0 ShaderBuilderMaterial.qml
+ShaderBuilderEffect 1.0 ShaderBuilderEffect.qml
 StandardMaterial 1.0 StandardMaterial.qml
 Subtract 1.0 Subtract.qml
 Sum 1.0 Sum.qml
