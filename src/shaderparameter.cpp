@@ -1,34 +1,25 @@
 #include "shaderparameter.h"
 
-ShaderParameter::ShaderParameter(Qt3DCore::QNode *parent) : Qt3DCore::QNode(parent)
+ShaderParameter::ShaderParameter(ShaderNode *parent) : ShaderNode(parent)
 {
 
 }
 
-QVariant ShaderParameter::value() const
+QString ShaderParameter::generateHeader() const
 {
-    return m_value;
+    QString header;
+    header += QString("uniform ") + type() + " " + identifier() + ";\n";
+    return header;
 }
 
-QString ShaderParameter::identifier() const
+QString ShaderParameter::generateBody() const
 {
-    return m_identifier;
+    return QString();
 }
 
-void ShaderParameter::setValue(QVariant value)
+bool ShaderParameter::setup(ShaderBuilder *shaderBuilder, QString tempIdentifier)
 {
-    if (m_value == value)
-        return;
-
-    m_value = value;
-    emit valueChanged(value);
-}
-
-void ShaderParameter::setIdentifier(QString identifier)
-{
-    if (m_identifier == identifier)
-        return;
-
-    m_identifier = identifier;
-    emit identifierChanged(identifier);
+    Q_UNUSED(shaderBuilder)
+    Q_UNUSED(tempIdentifier)
+    return true;
 }

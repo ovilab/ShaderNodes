@@ -333,7 +333,6 @@ bool ShaderNode::setup(ShaderBuilder* shaderBuilder, QString tempIdentifier)
             }
 
             ShaderNode *node = qvariant_cast<ShaderNode*>(value);
-            ShaderParameter* parameter = qvariant_cast<ShaderParameter*>(value);
 
             QString targetIdentifier;
             QString sourceType;
@@ -344,11 +343,6 @@ bool ShaderNode::setup(ShaderBuilder* shaderBuilder, QString tempIdentifier)
                 }
                 targetIdentifier = node->identifier();
                 sourceType = node->type();
-            } else if(parameter) {
-                targetIdentifier = QString("parameter") + "_" + propertyNameNoUnderscores + "_" + ShaderUtils::generateName();
-                parameter->setIdentifier(targetIdentifier);
-                sourceType = glslType(value);
-                shaderBuilder->m_shaderParameters.append({sourceType, targetIdentifier});
             } else {
                 targetIdentifier = createUniform(propertyName, value);
                 sourceType = glslType(value);

@@ -3,28 +3,19 @@
 
 #include <Qt3DCore/QNode>
 
-class ShaderParameter : public Qt3DCore::QNode
+#include "shadernode.h"
+
+class ShaderParameter : public ShaderNode
 {
     Q_OBJECT
-    Q_PROPERTY(QVariant value READ value WRITE setValue NOTIFY valueChanged)
-    Q_PROPERTY(QString identifier READ identifier NOTIFY identifierChanged)
 public:
-    explicit ShaderParameter(Qt3DCore::QNode *parent = 0);
+    explicit ShaderParameter(ShaderNode *parent = 0);
 
-    QVariant value() const;
-    QString identifier() const;
-
-signals:
-    void valueChanged(QVariant value);
-    void identifierChanged(QString identifier);
-
-public slots:
-    void setValue(QVariant value);
-    void setIdentifier(QString identifier);
+    virtual QString generateHeader() const override;
+    virtual QString generateBody() const override;
+    virtual bool setup(ShaderBuilder *shaderBuilder, QString tempIdentifier) override;
 
 private:
-    QVariant m_value;
-    QString m_identifier;
 };
 
 #endif // SHADERPARAMETER_H

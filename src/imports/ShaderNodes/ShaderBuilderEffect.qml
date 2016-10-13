@@ -141,6 +141,7 @@ void main()
         sourceFile: "qrc:/ShaderNodes/shaders/gl3/shader_builder_material.frag"
 
 //        onFinalShaderChanged: console.log(finalShader)
+//        QQ2.Component.onCompleted: console.log(finalShader)
 
         inputs: [
             ShaderNode {

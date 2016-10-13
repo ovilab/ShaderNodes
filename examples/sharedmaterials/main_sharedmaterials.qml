@@ -68,6 +68,7 @@ ApplicationWindow {
 
                         parameters: [
                             Parameter { name: param.identifier; value: index * 0.1 }
+//                            Parameter { name: "lol"; value: 12 }
                         ]
 
                         ShaderBuilderMaterialBinding {
@@ -90,7 +91,9 @@ ApplicationWindow {
 
             ShaderBuilderEffect {
                 id: builderEffect
-                fragmentColor: ShaderParameter { id: param; value: 1.0 }
+                fragmentColor: StandardMaterial {
+                    color: ShaderParameter { id: param; type: "float" }
+                }
             }
 
             SphereMesh {id: mesh}

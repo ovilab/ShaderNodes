@@ -128,10 +128,10 @@ QString ShaderUtils::glslType(const QVariant &value)
     if(texture) {
         return "sampler2D";
     }
-    ShaderParameter *parameter = qvariant_cast<ShaderParameter*>(value);
-    if(parameter) {
-        return glslType(parameter->value());
-    }
+//    ShaderParameter *parameter = qvariant_cast<ShaderParameter*>(value);
+//    if(parameter) {
+//        return glslType(parameter->value());
+//    }
 
     QString typeName = value.typeName();
     if(typeName == "QQmlListReference") {

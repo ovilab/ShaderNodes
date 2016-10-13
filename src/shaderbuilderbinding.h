@@ -22,12 +22,10 @@ public:
 
 signals:
     void propertyChanged(QString propertyName);
-
     void defaultValueChanged(QVariant defaultValue);
 
 public slots:
     void setPropertyName(QString propertyName);
-
     void setDefaultValue(QVariant defaultValue);
 
 private:
