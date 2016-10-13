@@ -22,9 +22,9 @@ void main() {
     texCoord = vertexTexCoord;
     position = vec3(modelMatrix*vec4(vertexPosition, 1.0));
 
-    // TODO something is wrong with tangent in GLSL 1.30
-    tangent = normalize(modelNormalMatrix * vertexTangent.xyz);
+    // TODO something is wrong with tangent in GLSL 3.3
     normal = normalize(modelNormalMatrix * vertexNormal.xyz);
+    tangent = normalize(modelNormalMatrix * vertexTangent.xyz);
     binormal = normalize(cross(normal, tangent));
 
 #pragma shadernodes body
