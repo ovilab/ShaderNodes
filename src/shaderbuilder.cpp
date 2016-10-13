@@ -84,7 +84,6 @@ void ShaderBuilder::appendOutput(QQmlListProperty<ShaderOutput> *list, ShaderOut
     self->m_outputs.append(output);
     QObject::connect(output, &ShaderOutput::nameChanged, self, &ShaderBuilder::markDirty);
     QObject::connect(output, &ShaderOutput::typeChanged, self, &ShaderBuilder::markDirty);
-    QObject::connect(output, &ShaderOutput::valueChanged, self, &ShaderBuilder::markDirty);
 }
 
 int ShaderBuilder::outputCount(QQmlListProperty<ShaderOutput> *list)
@@ -105,7 +104,6 @@ void ShaderBuilder::clearOutputs(QQmlListProperty<ShaderOutput> *list)
     for(const ShaderOutput *output : self->m_outputs) {
         QObject::disconnect(output, &ShaderOutput::nameChanged, self, &ShaderBuilder::markDirty);
         QObject::disconnect(output, &ShaderOutput::typeChanged, self, &ShaderBuilder::markDirty);
-        QObject::disconnect(output, &ShaderOutput::valueChanged, self, &ShaderBuilder::markDirty);
     }
     return self->m_outputs.clear();
 }
