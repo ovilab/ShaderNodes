@@ -35,9 +35,6 @@ void ShaderBuilder::clear()
         delete mapper;
     }
     m_signalMappers.clear();
-    for(UniformValue &uniformValue : m_uniforms) {
-//        delete uniformValue.parameter; // TODO causes segfault on exit, but why? Are params deleted by the material?
-    }
     m_uniforms.clear();
     m_finalShader = "";
 }
@@ -213,8 +210,7 @@ void ShaderBuilder::rebuildShader()
         header += "uniform highp " + uniform.type + " " + uniform.identifier + ";\n";
     }
     header += "\n// ------         parameters        ------\n\n";
-    for(const auto& param : m_parameterPlaceholders) {
-        qDebug() << param.first << param.second;
+    for(const auto& param : m_shaderParameters) {
         header += "uniform highp " + param.first + " " + param.second + ";\n";
     }
     header += "\n// ------   end generated header   ------\n\n";

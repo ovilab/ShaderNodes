@@ -2,6 +2,7 @@
 
 #include "shadernode.h"
 #include "shaderbuilderbinding.h"
+#include "shaderparameter.h"
 
 #include <QDebug>
 #include <QMetaProperty>
@@ -127,7 +128,7 @@ QString ShaderUtils::glslType(const QVariant &value)
     if(texture) {
         return "sampler2D";
     }
-    QParameter *parameter = qvariant_cast<QParameter*>(value);
+    ShaderParameter *parameter = qvariant_cast<ShaderParameter*>(value);
     if(parameter) {
         return glslType(parameter->value());
     }

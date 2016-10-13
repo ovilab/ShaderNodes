@@ -1,19 +1,19 @@
-#ifndef PARAMETERLISTBINDING_H
-#define PARAMETERLISTBINDING_H
+#ifndef SHADERBUILDERMATERIALBINDING_H
+#define SHADERBUILDERMATERIALBINDING_H
 
 #include <QObject>
 #include <Qt3DCore/QNode>
 #include <Qt3DRender/QMaterial>
 #include "shaderbuilder.h"
 
-class ParameterListBinding : public Qt3DCore::QNode
+class ShaderBuilderMaterialBinding : public Qt3DCore::QNode
 {
     Q_OBJECT
     Q_PROPERTY(QMaterial* material READ material WRITE setMaterial NOTIFY materialChanged)
     Q_PROPERTY(ShaderBuilder* shaderBuilder READ shaderBuilder WRITE setShaderBuilder NOTIFY shaderBuilderChanged)
 
 public:
-    explicit ParameterListBinding(Qt3DCore::QNode *parent = 0);
+    explicit ShaderBuilderMaterialBinding(Qt3DCore::QNode *parent = 0);
 
     QMaterial* material() const;
     ShaderBuilder* shaderBuilder() const;
@@ -38,4 +38,4 @@ private:
     ShaderBuilder* m_shaderBuilder = nullptr;
 };
 
-#endif // PARAMETERLISTBINDING_H
+#endif // SHADERBUILDERMATERIALBINDING_H

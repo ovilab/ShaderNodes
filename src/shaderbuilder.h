@@ -109,9 +109,9 @@ private:
     bool m_dirty = true;
 
 public:
-    QList<QPair<QString, QString>> m_parameterPlaceholders;
+    QList<QPair<QString, QString>> m_shaderParameters;
 
-    friend class ParameterListBinding;
+    friend class ShaderBuilderMaterialBinding;
 };
 
 #endif // SHADERBUILDER_H

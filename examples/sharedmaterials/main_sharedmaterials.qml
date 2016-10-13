@@ -60,18 +60,24 @@ ApplicationWindow {
                         transform1,
                         material
                     ]
+
                     Material {
                         id: material
 
                         effect: builderEffect
 
                         parameters: [
-                            Parameter { name: param.name; value: index * 0.1 }
+                            Parameter { name: param.identifier; value: index * 0.1 }
                         ]
 
-                        ParameterListBinding {
+                        ShaderBuilderMaterialBinding {
                             material: material
                             shaderBuilder: builderEffect.fragmentShaderBuilder
+                        }
+
+                        ShaderBuilderMaterialBinding {
+                            material: material
+                            shaderBuilder: builderEffect.vertexShaderBuilder
                         }
                     }
 
@@ -84,7 +90,7 @@ ApplicationWindow {
 
             ShaderBuilderEffect {
                 id: builderEffect
-                fragmentColor: Parameter { id: param; value: 1.0 }
+                fragmentColor: ShaderParameter { id: param; value: 1.0 }
             }
 
             SphereMesh {id: mesh}

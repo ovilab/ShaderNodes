@@ -1,23 +1,23 @@
-#include "parameterlistbinding.h"
+#include "shaderbuildermaterialbinding.h"
 
 #include <Qt3DRender/QParameter>
 
-ParameterListBinding::ParameterListBinding(Qt3DCore::QNode *parent) : Qt3DCore::QNode(parent)
+ShaderBuilderMaterialBinding::ShaderBuilderMaterialBinding(Qt3DCore::QNode *parent) : Qt3DCore::QNode(parent)
 {
 
 }
 
-QMaterial *ParameterListBinding::material() const
+QMaterial *ShaderBuilderMaterialBinding::material() const
 {
     return m_material;
 }
 
-ShaderBuilder *ParameterListBinding::shaderBuilder() const
+ShaderBuilder *ShaderBuilderMaterialBinding::shaderBuilder() const
 {
     return m_shaderBuilder;
 }
 
-void ParameterListBinding::setMaterial(QMaterial *material)
+void ShaderBuilderMaterialBinding::setMaterial(QMaterial *material)
 {
     if (m_material == material)
         return;
@@ -31,25 +31,25 @@ void ParameterListBinding::setMaterial(QMaterial *material)
     emit materialChanged(material);
 }
 
-void ParameterListBinding::setShaderBuilder(ShaderBuilder *shaderBuilder)
+void ShaderBuilderMaterialBinding::setShaderBuilder(ShaderBuilder *shaderBuilder)
 {
     if (m_shaderBuilder == shaderBuilder)
         return;
     if(m_shaderBuilder) {
         clear();
-        disconnect(shaderBuilder, &ShaderBuilder::clearBegin, this, &ParameterListBinding::clear);
-        disconnect(shaderBuilder, &ShaderBuilder::buildFinished, this, &ParameterListBinding::apply);
+        disconnect(shaderBuilder, &ShaderBuilder::clearBegin, this, &ShaderBuilderMaterialBinding::clear);
+        disconnect(shaderBuilder, &ShaderBuilder::buildFinished, this, &ShaderBuilderMaterialBinding::apply);
     }
     m_shaderBuilder = shaderBuilder;
     if(m_shaderBuilder) {
-        connect(shaderBuilder, &ShaderBuilder::clearBegin, this, &ParameterListBinding::clear);
-        connect(shaderBuilder, &ShaderBuilder::buildFinished, this, &ParameterListBinding::apply);
+        connect(shaderBuilder, &ShaderBuilder::clearBegin, this, &ShaderBuilderMaterialBinding::clear);
+        connect(shaderBuilder, &ShaderBuilder::buildFinished, this, &ShaderBuilderMaterialBinding::apply);
         apply();
     }
     emit shaderBuilderChanged(shaderBuilder);
 }
 
-void ParameterListBinding::clear()
+void ShaderBuilderMaterialBinding::clear()
 {
     if(m_material && m_shaderBuilder) {
         for(UniformValue &uniformValue : m_shaderBuilder->m_uniforms) {
@@ -58,7 +58,7 @@ void ParameterListBinding::clear()
     }
 }
 
-void ParameterListBinding::apply()
+void ShaderBuilderMaterialBinding::apply()
 {
     if(m_material && m_shaderBuilder) {
         for(UniformValue &uniformValue : m_shaderBuilder->m_uniforms) {
