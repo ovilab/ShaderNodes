@@ -13,7 +13,6 @@ int main(int argc, char *argv[])
     QSurfaceFormat format;
     format.setMajorVersion(3);
     format.setMinorVersion(3);
-    format.setProfile(QSurfaceFormat::CoreProfile);
     QSurfaceFormat::setDefaultFormat(format);
 
     QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);

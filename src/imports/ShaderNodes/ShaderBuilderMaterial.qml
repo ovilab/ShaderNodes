@@ -22,7 +22,7 @@ Material {
                 api: GraphicsApiFilter.OpenGL
                 profile: GraphicsApiFilter.CoreProfile
                 majorVersion: 3
-                minorVersion: 2
+                minorVersion: 3
             }
             filterKeys: FilterKey {
                 name: "renderingStyle"
