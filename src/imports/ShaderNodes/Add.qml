@@ -15,7 +15,7 @@ ShaderNode {
 
     source: {
         var result = ""
-        result += type + " $sumresult;\n"
+        result += type + " $sumresult = 0.0;\n"
         if(values && values.length) {
             for(var i in values) {
                 result += "$sumresult += $(values[" + i + "], " + type + ");\n"
