@@ -1,8 +1,9 @@
 #include "shaderparameter.h"
 
-ShaderParameter::ShaderParameter(ShaderNode *parent) : ShaderNode(parent)
+ShaderParameter::ShaderParameter(ShaderNode *parent)
+    : ShaderNode(parent)
 {
-
+    setType("vec4");
 }
 
 QString ShaderParameter::generateHeader() const

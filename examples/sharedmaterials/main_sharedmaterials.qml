@@ -92,7 +92,7 @@ ApplicationWindow {
             ShaderBuilderEffect {
                 id: builderEffect
                 fragmentColor: StandardMaterial {
-                    color: ShaderParameter { id: param; type: "float" }
+                    color: ShaderParameter { id: param }
                 }
             }
 
