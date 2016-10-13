@@ -33,9 +33,13 @@ void main() {
     position = vec3(modelMatrix*vec4(vertexPosition, 1.0));
 
     // TODO something is wrong with tangent in GLSL 3.3
-    normal = normalize(modelNormalMatrix * vertexNormal.xyz);
+    normal = vertexNormal;
+    if(length(normal) <= 0.0) {
+        normal = vec3(0.0, 0.0, 1.0);
+    }
+    normal = normalize(modelNormalMatrix * normal);
     tangent = vertexTangent.xyz;
-    if(length(tangent) <= 0) {
+    if(length(tangent) <= 0.0) {
         tangent = makePerpendicular(normal);
     }
     tangent = normalize(modelNormalMatrix * tangent.xyz);
