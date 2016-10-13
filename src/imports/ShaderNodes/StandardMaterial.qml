@@ -3,7 +3,10 @@ import ShaderNodes 1.0
 
 ShaderNode {
     property var color: "darkgrey"
-
+    property var attenuationOffset: 0.0
+    onAttenuationOffsetChanged: {
+        console.log("New offset: ", attenuationOffset)
+    }
     property var ambientColor: color
     property var diffuseColor: color
     property var specularColor: color
@@ -45,7 +48,7 @@ ShaderNode {
             output += "$this += standardMaterialLight($lights[" + i + "], $(normal, vec3), $(position, vec3), eyePosition,\n"
             output += "             $(ambientColor, vec3), $(diffuseColor, vec3), $(specularColor, vec3),\n"
             output += "             0.01 * $(ambientIntensity, float), $(diffuseIntensity, float), 0.01 * $(specularIntensity, float),\n"
-            output += "             150.0 * $(hardness, float));\n"
+            output += "             150.0 * $(hardness, float), $(attenuationOffset, float));\n"
         }
         return output
     }
