@@ -18,13 +18,27 @@ uniform highp mat4 viewMatrix;
 uniform highp mat4 projectionMatrix;
 uniform highp mat4 mvp;
 
+highp vec3 makePerpendicular(highp vec3 v) {
+    if(v.x == 0.0 && v.y == 0.0) {
+        if(v.z == 0.0) {
+            return vec3(0.0, 0.0, 0.0);
+        }
+        return vec3(0.0, 1.0, 0.0);
+    }
+    return vec3(-v.y, v.x, 0.0);
+}
+
 void main() {
     texCoord = vertexTexCoord;
     position = vec3(modelMatrix*vec4(vertexPosition, 1.0));
 
     // TODO something is wrong with tangent in GLSL 3.3
     normal = normalize(modelNormalMatrix * vertexNormal.xyz);
-    tangent = normalize(modelNormalMatrix * vertexTangent.xyz);
+    tangent = vertexTangent.xyz;
+    if(length(tangent) <= 0) {
+        tangent = makePerpendicular(normal);
+    }
+    tangent = normalize(modelNormalMatrix * tangent.xyz);
     binormal = normalize(cross(normal, tangent));
 
 #pragma shadernodes body
