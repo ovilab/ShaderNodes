@@ -259,7 +259,7 @@ QString ShaderUtils::convert(const QString &sourceType, const QString &targetTyp
         {"uint", "uint(" + v + ")"},
         {"float", "float(" + v + ")"},
         {"double", "double(" + v + ")"},
-        {"vec3", "vec2(" + v + ", " + v + ")"},
+        {"vec2", "vec2(" + v + ", " + v + ")"},
         {"vec3", "vec3(" + v + ", " + v + ", " + v + ")"},
         {"vec4", "vec4(" + v + ", " + v + ", " + v + ", 1.0)"}
     };
