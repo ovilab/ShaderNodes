@@ -57,7 +57,7 @@ void NodeWrapper::resetProperty(const QString &propertyName)
         QQmlBinding *qmlBinding = dynamic_cast<QQmlBinding*>(binding);
         if (qmlBinding)
             qmlBinding->setTarget(property);
-        QQmlPropertyPrivate::setBinding(binding, QQmlPropertyPrivate::None, QQmlPropertyPrivate::DontRemoveBinding);
+        QQmlPropertyPrivate::setBinding(binding);
         if (qmlBinding)
             qmlBinding->update();
     } else if(m_resetValueHash.contains(propertyName)) {
