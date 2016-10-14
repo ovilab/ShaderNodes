@@ -4,9 +4,6 @@ import ShaderNodes 1.0
 ShaderNode {
     property var color: "darkgrey"
     property var attenuationOffset: 0.0
-    onAttenuationOffsetChanged: {
-        console.log("New offset: ", attenuationOffset)
-    }
     property var ambientColor: color
     property var diffuseColor: color
     property var specularColor: color

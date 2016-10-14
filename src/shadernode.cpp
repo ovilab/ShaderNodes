@@ -101,7 +101,7 @@ void ShaderNode::handlePropertyChange(int index)
     }
 }
 
-QString ShaderNode::createUniform(const QString &propertyName, const QVariant &value)
+QString ShaderNode::createUniform(const QString &propertyName, const QVariant &value, ShaderBuilder *shaderBuilder)
 {
     QByteArray propertyNameArray = propertyName.toUtf8();
     int propertyIndex = metaObject()->indexOfProperty(propertyNameArray.constData());
@@ -113,41 +113,38 @@ QString ShaderNode::createUniform(const QString &propertyName, const QVariant &v
     QMetaProperty metaProperty = metaObject()->property(propertyIndex);
 
     QString propertyNameNoUnderscores = QString(propertyName).replace("_", "");
-    QString uniformPrefix = "uniform";
-    switch(shaderBuilder()->shaderType()) {
-    case ShaderBuilder::ShaderType::Fragment:
-        uniformPrefix = "fragment_uniform";
-        break;
-    case ShaderBuilder::ShaderType::Geometry:
-        uniformPrefix = "geometry_uniform";
-        break;
-    case ShaderBuilder::ShaderType::Vertex:
-        uniformPrefix = "vertex_uniform";
-        break;
-    default:
-        break;
+    QString uniformPrefix = "node_uniform";
+    QString targetIdentifier =  uniformPrefix + "_" + propertyNameNoUnderscores + "_" + ShaderUtils::generateName();
+
+    ShaderUniformValue *uniform = new ShaderUniformValue(this, propertyName, targetIdentifier, value);
+
+    if(!metaProperty.hasNotifySignal()) {
+        qWarning() << "WARNING: ShaderBuilder::addUniform(): Property" << propertyName << "on" << name()
+                   << "has no notification signal.";
+    } else {
+        const QByteArray signal = '2' + metaProperty.notifySignal().methodSignature();
+        connect(this, signal, uniform, SLOT(updateValue()));
     }
 
-    QString targetIdentifier =  uniformPrefix + "_" + propertyNameNoUnderscores + "_" + ShaderUtils::generateName();
-    shaderBuilder()->addUniform(this, propertyName, targetIdentifier, value, metaProperty);
+    m_uniforms.append(uniform);
+
+    shaderBuilder->addUniform(uniform);
 
     return targetIdentifier;
 }
 
-bool ShaderNode::setup(ShaderBuilder* shaderBuilder, QString tempIdentifier)
+ShaderNodeSetupResult ShaderNode::setup(ShaderBuilder* shaderBuilder, QString tempIdentifier)
 {
-    setShaderBuilder(shaderBuilder);
-
     if(m_hasSetup && tempIdentifier.isEmpty()) {
-        return true;
+        return {true, m_resolvedDependencies};
     }
     if(!m_requirement) {
         qWarning() << "WARNING: ShaderNode::setup(): Requirement for" << this << name() << "is not satisfied.";
-        return false;
+        return {false, QList<ShaderNode*>()};
     }
     if(m_type.isEmpty()) {
         qWarning() << "WARNING: ShaderNode::setup(): " << name() << "is missing type.";
-        return false;
+        return {false, QList<ShaderNode*>()};
     }
     QString currentIdentifier;
     if(tempIdentifier.isEmpty()) {
@@ -169,12 +166,15 @@ bool ShaderNode::setup(ShaderBuilder* shaderBuilder, QString tempIdentifier)
         if(dependency == this) {
             continue;
         }
-        if(!dependency->setup(shaderBuilder)) {
-            return false;
+        const auto &dependencySetup = dependency->setup(shaderBuilder);
+        if(!dependencySetup.m_ok) {
+            return {false, QList<ShaderNode*>()};
         }
         m_resolvedDependencies.append(dependency);
+        m_resolvedDependencies.append(dependencySetup.m_dependencies);
     }
 
+    // TODO old signal mappers need to be deleted at some point
     for(QSignalMapper *mapper : m_signalMappers) {
         disconnect(this, 0, mapper, SLOT(map()));
         disconnect(mapper, SIGNAL(mapped(int)), this, SLOT(handlePropertyChange(int)));
@@ -213,7 +213,10 @@ bool ShaderNode::setup(ShaderBuilder* shaderBuilder, QString tempIdentifier)
         if(value.type() == QVariant::Int) {
             // Var values may be parsed as int by QML
             // but we need to treat them as floating point numbers
-            value = QVariant(double(value.toInt()));
+            value = value.toDouble();
+        }
+        if(value.type() == QVariant::String) {
+            value = QColor(value.toString());
         }
 
         m_propertyTypeNames[i] = value.typeName();
@@ -277,17 +280,21 @@ bool ShaderNode::setup(ShaderBuilder* shaderBuilder, QString tempIdentifier)
                     continue;
                 }
                 for(const QVariant& listValue : list) {
+                    QVariant value = listValue;
+                    if(listValue.type() == QVariant::String) {
+                        value = QColor(listValue.toString()); // TODO do proper conversion
+                    }
                     QString targetIdentifier;
                     QString sourceType;
                     if(ShaderNode *node = qvariant_cast<ShaderNode*>(listValue)) {
-                        success = success && node->setup(shaderBuilder);
-                        if(!m_resolvedDependencies.contains(node)) {
-                            m_resolvedDependencies.append(node);
-                        }
+                        const auto &nodeSetup = node->setup(shaderBuilder);
+                        success = success && nodeSetup.m_ok;
+                        m_resolvedDependencies.append(node);
+                        m_resolvedDependencies.append(nodeSetup.m_dependencies);
                         targetIdentifier = node->identifier();
                         sourceType = node->type();
                     } else {
-                        targetIdentifier = createUniform(propertyName, listValue);
+                        targetIdentifier = createUniform(propertyName, listValue, shaderBuilder);
                         sourceType = glslType(listValue);
                     }
                     // replaces '$property' or '$(property, type)'
@@ -316,12 +323,12 @@ bool ShaderNode::setup(ShaderBuilder* shaderBuilder, QString tempIdentifier)
                     ShaderNode *node = qobject_cast<ShaderNode*>(object);
                     if(!node) {
                         qWarning() << "ERROR: Could not convert listed object to ShaderNode:" << object;
-                        return false;
+                        return {false, QList<ShaderNode*>()};
                     }
-                    success = success && node->setup(shaderBuilder);
-                    if(!m_resolvedDependencies.contains(node)) {
-                        m_resolvedDependencies.append(node);
-                    }
+                    const auto& nodeSetup = node->setup(shaderBuilder);
+                    success = success && nodeSetup.m_ok;
+                    m_resolvedDependencies.append(node);
+                    m_resolvedDependencies.append(nodeSetup.m_dependencies);
                     QString targetIdentifier = node->identifier();
                     QString sourceType = node->type();
                     // replaces '$property' or '$(property, type)'
@@ -337,14 +344,14 @@ bool ShaderNode::setup(ShaderBuilder* shaderBuilder, QString tempIdentifier)
             QString targetIdentifier;
             QString sourceType;
             if(node) {
-                success = success && node->setup(shaderBuilder);
-                if(!m_resolvedDependencies.contains(node)) {
-                    m_resolvedDependencies.append(node);
-                }
+                const auto& nodeSetup = node->setup(shaderBuilder);
+                success = success && nodeSetup.m_ok;
+                m_resolvedDependencies.append(node);
+                m_resolvedDependencies.append(nodeSetup.m_dependencies);
                 targetIdentifier = node->identifier();
                 sourceType = node->type();
             } else {
-                targetIdentifier = createUniform(propertyName, value);
+                targetIdentifier = createUniform(propertyName, value, shaderBuilder);
                 sourceType = glslType(value);
             }
             if(targetIdentifier.isEmpty()) {
@@ -362,7 +369,7 @@ bool ShaderNode::setup(ShaderBuilder* shaderBuilder, QString tempIdentifier)
         m_hasSetup = true;
     }
     m_resolvedSource = sourceContent;
-    return success;
+    return {success, m_resolvedDependencies};
 }
 
 QString ShaderNode::generateBody() const
@@ -479,6 +486,15 @@ void ShaderNode::setExportedTypeName(QString exportedTypeName)
     emit exportedTypeNameChanged(exportedTypeName);
 }
 
+void ShaderNode::setArrayProperties(QStringList arrayProperties)
+{
+    if (m_arrayProperties == arrayProperties)
+        return;
+
+    m_arrayProperties = arrayProperties;
+    emit arrayPropertiesChanged(arrayProperties);
+}
+
 void ShaderNode::setHeaderFiles(QList<QUrl> headerFiles)
 {
     if (m_headerFiles == headerFiles)
@@ -495,38 +511,6 @@ void ShaderNode::setHeaderFiles(QList<QUrl> headerFiles)
 
     m_headerFiles = headerFiles;
     emit headerFilesChanged(headerFiles);
-}
-
-ShaderBuilder *ShaderNode::shaderBuilder() const
-{
-    return m_shaderBuilder;
-}
-
-void ShaderNode::setShaderBuilder(ShaderBuilder *shaderBuilder)
-{
-    // TODO rewrite so that a shader builder lists the node as its dependency
-    // this way we can use the same node for two shader builders
-
-    if(m_shaderBuilder) {
-        disconnect(this, &ShaderNode::headerChanged, m_shaderBuilder, &ShaderBuilder::markDirty);
-        disconnect(this, &ShaderNode::resultChanged, m_shaderBuilder, &ShaderBuilder::markDirty);
-        disconnect(this, &ShaderNode::sourceChanged, m_shaderBuilder, &ShaderBuilder::markDirty);
-        disconnect(this, &ShaderNode::typeChanged, m_shaderBuilder, &ShaderBuilder::markDirty);
-        disconnect(this, &ShaderNode::identifierChanged, m_shaderBuilder, &ShaderBuilder::markDirty);
-        disconnect(this, &ShaderNode::propertyTypeChanged, m_shaderBuilder, &ShaderBuilder::markDirty);
-        disconnect(this, &ShaderNode::markDirty, m_shaderBuilder, &ShaderBuilder::markDirty);
-    }
-    m_shaderBuilder = shaderBuilder;
-    if(!m_shaderBuilder) {
-        return;
-    }
-    connect(this, &ShaderNode::headerChanged, m_shaderBuilder, &ShaderBuilder::markDirty);
-    connect(this, &ShaderNode::resultChanged, m_shaderBuilder, &ShaderBuilder::markDirty);
-    connect(this, &ShaderNode::sourceChanged, m_shaderBuilder, &ShaderBuilder::markDirty);
-    connect(this, &ShaderNode::typeChanged, m_shaderBuilder, &ShaderBuilder::markDirty);
-    connect(this, &ShaderNode::identifierChanged, m_shaderBuilder, &ShaderBuilder::markDirty);
-    connect(this, &ShaderNode::propertyTypeChanged, m_shaderBuilder, &ShaderBuilder::markDirty);
-    connect(this, &ShaderNode::markDirty, m_shaderBuilder, &ShaderBuilder::markDirty);
 }
 
 QString ShaderNode::glslType(QVariant value) const
@@ -603,4 +587,14 @@ void ShaderNode::clearDependencies()
 QString ShaderNode::exportedTypeName() const
 {
     return m_exportedTypeName;
+}
+
+QStringList ShaderNode::arrayProperties() const
+{
+    return m_arrayProperties;
+}
+
+QList<QUrl> ShaderNode::headerFiles() const
+{
+    return m_headerFiles;
 }

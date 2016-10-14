@@ -1,6 +1,8 @@
 #ifndef SHADERNODE_H
 #define SHADERNODE_H
 
+#include "shaderuniformvalue.h"
+
 #include <QString>
 #include <QVariant>
 #include <QList>
@@ -10,8 +12,17 @@
 #include <QUrl>
 
 #include <Qt3DCore/QNode>
+#include <Qt3DCore>
+#include <Qt3DLogic>
+#include <Qt3DRender>
 
 class ShaderBuilder;
+
+struct ShaderNodeSetupResult
+{
+    bool m_ok;
+    QList<ShaderNode*> m_dependencies;
+};
 
 class ShaderNode : public Qt3DCore::QNode
 {
@@ -50,9 +61,7 @@ public:
     QString header() const;
     QString identifier() const;
     void reset() const;
-    virtual bool setup(ShaderBuilder* shaderBuilder, QString tempIdentifier = QString());
-    ShaderBuilder *shaderBuilder() const;
-    void setShaderBuilder(ShaderBuilder *shaderBuilder);
+    virtual ShaderNodeSetupResult setup(ShaderBuilder *shaderBuilder, QString tempIdentifier = QString());
     QString source() const;
     bool requirement() const;
     QQmlListProperty<ShaderNode> dependencies();
@@ -63,16 +72,9 @@ public:
     void removeDependency(ShaderNode *dependency);
     void clearDependencies();
     QString exportedTypeName() const;
-
-    QStringList arrayProperties() const
-    {
-        return m_arrayProperties;
-    }
-
-    QList<QUrl> headerFiles() const
-    {
-        return m_headerFiles;
-    }
+    QStringList arrayProperties() const;
+    QList<QUrl> headerFiles() const;
+    QVector<Qt3DRender::QParameter*> parameters() const;
 
 signals:
     void nameChanged(QString name);
@@ -87,7 +89,6 @@ signals:
     void exportedTypeNameChanged(QString exportedTypeName);
     void arrayPropertiesChanged(QStringList arrayProperties);
     void markDirty();
-
     void headerFilesChanged(QList<QUrl> headerFiles);
 
 public slots:
@@ -99,16 +100,7 @@ public slots:
     void setRequirement(bool requirement);
     void setHeaderFile(QUrl headerFile);
     void setExportedTypeName(QString exportedTypeName);
-
-    void setArrayProperties(QStringList arrayProperties)
-    {
-        if (m_arrayProperties == arrayProperties)
-            return;
-
-        m_arrayProperties = arrayProperties;
-        emit arrayPropertiesChanged(arrayProperties);
-    }
-
+    void setArrayProperties(QStringList arrayProperties);
     void setHeaderFiles(QList<QUrl> headerFiles);
 
 protected: // TODO make private
@@ -130,17 +122,19 @@ protected: // TODO make private
     QString m_resolvedSource;
     QList<ShaderNode*> m_resolvedDependencies;
     QList<ShaderNode*> m_declaredDependencies;
+    QVector<ShaderUniformValue*> m_uniforms;
     QMap<int, QString> m_propertyTypeNames;
+    QMap<int, Qt3DRender::QParameter*> m_indexToParameter;
     QString m_source;
-
     QList<QSignalMapper*> m_signalMappers;
+
 private slots:
     void handlePropertyChange(int index);
 
 private:
     void replaceVariant(const QVariant &value, QString &sourceContent, bool &success, const QString &propertyName, const QString &propertyNameNoUnderscores, const QString &targetType);
     QString generateUniformName(const QString &propertyName);
-    QString createUniform(const QString &propertyName, const QVariant &value);
+    QString createUniform(const QString &propertyName, const QVariant &value, ShaderBuilder *shaderBuilder);
     QStringList m_arrayProperties;
     QList<QUrl> m_headerFiles;
 };

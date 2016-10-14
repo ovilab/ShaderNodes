@@ -29,14 +29,31 @@ void ShaderBuilder::clear()
 {
     emit clearBegin();
 
-    for(QSignalMapper *mapper : m_signalMappers) {
-        disconnect(this, 0, mapper, SLOT(map()));
-        disconnect(mapper, SIGNAL(mapped(int)), this, SLOT(updateUniform(int)));
-        delete mapper;
+    if(m_renderPass) {
+        for(ShaderUniformValue *uniform : m_uniforms) {
+            m_renderPass->removeParameter(uniform->m_parameter);
+        }
     }
-    m_signalMappers.clear();
+
+    for(const auto& node : m_dependencies) {
+        disconnect(node, &ShaderNode::headerChanged, this, &ShaderBuilder::markDirty);
+        disconnect(node, &ShaderNode::resultChanged, this, &ShaderBuilder::markDirty);
+        disconnect(node, &ShaderNode::sourceChanged, this, &ShaderBuilder::markDirty);
+        disconnect(node, &ShaderNode::typeChanged, this, &ShaderBuilder::markDirty);
+        disconnect(node, &ShaderNode::identifierChanged, this, &ShaderBuilder::markDirty);
+        disconnect(node, &ShaderNode::propertyTypeChanged, this, &ShaderBuilder::markDirty);
+        disconnect(node, &ShaderNode::markDirty, this, &ShaderBuilder::markDirty);
+    }
+
+    m_dependencies.clear();
+
     m_uniforms.clear();
     m_finalShader = "";
+}
+
+QRenderPass *ShaderBuilder::renderPass() const
+{
+    return m_renderPass;
 }
 
 QString ShaderBuilder::source() const
@@ -68,6 +85,11 @@ QQmlListProperty<ShaderOutput> ShaderBuilder::outputs()
                                           ShaderBuilder::outputCount,
                                           ShaderBuilder::outputAt,
                                           ShaderBuilder::clearOutputs);
+}
+
+void ShaderBuilder::addUniform(ShaderUniformValue *uniform)
+{
+    m_uniforms.append(uniform);
 }
 
 void ShaderBuilder::appendOutput(QQmlListProperty<ShaderOutput> *list, ShaderOutput *output)
@@ -132,50 +154,6 @@ void ShaderBuilder::clearInputs(QQmlListProperty<ShaderNode> *list)
     return self->m_inputs.clear();
 }
 
-QVariantMap ShaderBuilder::uniforms() const
-{
-    QVariantMap result;
-    for(const UniformValue &uniform : m_uniforms) {
-        result[uniform.identifier] = uniform.value;
-    }
-    return result;
-}
-
-void ShaderBuilder::addUniform(ShaderNode *node, const QString &propertyName, const QString &identifier,
-                               const QVariant &value, QMetaProperty metaProperty)
-{
-    UniformValue uniform;
-    uniform.node = node;
-    uniform.propertyName = propertyName;
-    uniform.identifier = identifier;
-    uniform.value = value;
-    uniform.type = glslType(value);
-
-    QParameter* param = new QParameter();
-    param->setName(identifier);
-    if(value.type() == QVariant::String) {
-        // TODO use property value to color conversions as found in Qt sources
-        param->setValue(QColor(value.toString()));
-    } else {
-        param->setValue(value);
-    }
-
-    uniform.parameter = param;
-    m_uniforms.append(uniform);
-
-    if(!metaProperty.hasNotifySignal()) {
-        qWarning() << "WARNING: ShaderBuilder::addUniform(): Property" << propertyName << "on" << node->name()
-                   << "has no notification signal.";
-    } else {
-        QSignalMapper *mapper = new QSignalMapper;
-        mapper->setMapping(node, m_uniforms.length() - 1);
-        const QByteArray signal = '2' + metaProperty.notifySignal().methodSignature();
-        connect(node, signal, mapper, SLOT(map()));
-        connect(mapper, SIGNAL(mapped(int)), this, SLOT(updateUniform(int)));
-        m_signalMappers.append(mapper);
-    }
-}
-
 QUrl ShaderBuilder::sourceFile() const
 {
     return m_sourceFile;
@@ -193,10 +171,29 @@ void ShaderBuilder::rebuildShader()
 
     // Verify all that all outputs have values
     for(ShaderOutput *output : m_outputs) {
-        bool success = output->node()->setup(this);
-        if(!success) {
+        const auto& result = output->node()->setup(this);
+        if(!result.m_ok) {
             qWarning() << "ERROR: ShaderBuilder::rebuildShader(): One of the shader nodes failed during setup.";
+            clear();
             return;
+        }
+        m_dependencies.append(output->node());
+        m_dependencies.append(result.m_dependencies);
+    }
+
+    for(const auto& node : m_dependencies) {
+        connect(node, &ShaderNode::headerChanged, this, &ShaderBuilder::markDirty);
+        connect(node, &ShaderNode::resultChanged, this, &ShaderBuilder::markDirty);
+        connect(node, &ShaderNode::sourceChanged, this, &ShaderBuilder::markDirty);
+        connect(node, &ShaderNode::typeChanged, this, &ShaderBuilder::markDirty);
+        connect(node, &ShaderNode::identifierChanged, this, &ShaderBuilder::markDirty);
+        connect(node, &ShaderNode::propertyTypeChanged, this, &ShaderBuilder::markDirty);
+        connect(node, &ShaderNode::markDirty, this, &ShaderBuilder::markDirty);
+    }
+
+    if(m_renderPass) {
+        for(const ShaderUniformValue *uniform : m_uniforms) {
+            m_renderPass->addParameter(uniform->m_parameter);
         }
     }
 
@@ -206,8 +203,8 @@ void ShaderBuilder::rebuildShader()
         header += output->node()->generateHeader();
     }
     header += "\n// ------          uniforms        ------\n\n";
-    for(const UniformValue &uniform : m_uniforms) {
-        header += "uniform highp " + uniform.type + " " + uniform.identifier + ";\n";
+    for(const ShaderUniformValue *uniform : m_uniforms) {
+        header += "uniform highp " + uniform->m_type + " " + uniform->m_identifier + ";\n";
     }
     header += "\n// ------         parameters        ------\n\n";
     for(const auto& param : m_shaderParameters) {
@@ -253,24 +250,23 @@ void ShaderBuilder::rebuildShader()
     emit buildFinished();
 }
 
-void ShaderBuilder::updateUniform(int i)
-{
-    UniformValue &uniform = m_uniforms[i];
-    QByteArray propertyNameArray = uniform.propertyName.toUtf8();
-    QVariant value = uniform.node->property(propertyNameArray.constData());;
-    uniform.value = value;
-    if(value.type() == QVariant::String) {
-        uniform.parameter->setValue(QColor(value.toString()));
-    } else {
-        uniform.parameter->setValue(value);
-    }
-    QString type = glslType(value);
-    if(type != uniform.type) {
-        uniform.type = type;
-        markDirty();
-    }
-    emit uniformsChanged();
-}
+//void ShaderBuilder::updateUniform(int i)
+//{
+//    UniformValue &uniform = m_uniforms[i];
+//    QByteArray propertyNameArray = uniform.propertyName.toUtf8();
+//    QVariant value = uniform.node->property(propertyNameArray.constData());;
+//    uniform.value = value;
+//    if(value.type() == QVariant::String) {
+//        uniform.parameter->setValue(QColor(value.toString()));
+//    } else {
+//        uniform.parameter->setValue(value);
+//    }
+//    QString type = glslType(value);
+//    if(type != uniform.type) {
+//        uniform.type = type;
+//        markDirty();
+//    }
+//}
 
 void ShaderBuilder::setSourceFile(QUrl sourceFile)
 {
@@ -295,6 +291,17 @@ void ShaderBuilder::setShaderType(ShaderBuilder::ShaderType shaderType)
     m_shaderType = shaderType;
     markDirty();
     emit shaderTypeChanged(shaderType);
+}
+
+void ShaderBuilder::setRenderPass(QRenderPass *renderPass)
+{
+    if (m_renderPass == renderPass)
+        return;
+
+    clear();
+    m_renderPass = renderPass;
+    markDirty();
+    emit renderPassChanged(renderPass);
 }
 
 void ShaderBuilder::setSource(QString source)

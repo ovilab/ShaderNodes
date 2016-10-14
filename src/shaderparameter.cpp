@@ -18,9 +18,9 @@ QString ShaderParameter::generateBody() const
     return QString();
 }
 
-bool ShaderParameter::setup(ShaderBuilder *shaderBuilder, QString tempIdentifier)
+ShaderNodeSetupResult ShaderParameter::setup(ShaderBuilder *shaderBuilder, QString tempIdentifier)
 {
     Q_UNUSED(shaderBuilder)
     Q_UNUSED(tempIdentifier)
-    return true;
+    return {true, QList<ShaderNode*>()};
 }

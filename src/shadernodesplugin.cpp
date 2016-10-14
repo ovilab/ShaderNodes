@@ -22,7 +22,7 @@ void ShaderNodesPlugin::registerTypes(const char *uri)
     qmlRegisterType<ShaderBuilder>(packageUri, 1, 0, "ShaderBuilder");
     qmlRegisterType<ShaderOutput>(packageUri, 1, 0, "ShaderOutput");
     qmlRegisterType<ShaderBuilderBinding>(packageUri, 1, 0, "ShaderBuilderBinding");
-    qmlRegisterType<ShaderBuilderMaterialBinding>(packageUri, 1, 0, "ShaderBuilderMaterialBinding");
+//    qmlRegisterType<ShaderBuilderMaterialBinding>(packageUri, 1, 0, "ShaderBuilderMaterialBinding");
     qmlRegisterType<ShaderParameter>(packageUri, 1, 0, "ShaderParameter");
 
     qmlRegisterSingletonType<ShaderUtils>(packageUri, 1, 0, "ShaderUtils", &ShaderUtils::qmlInstance);

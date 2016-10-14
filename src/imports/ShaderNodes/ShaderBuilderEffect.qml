@@ -28,6 +28,7 @@ Effect {
                 value: "forward"
             }
             renderPasses: RenderPass {
+                id: builderRenderPass
                 shaderProgram: ShaderProgram {
                     vertexShaderCode: vertexShaderBuilder.finalShader
                     fragmentShaderCode: fragmentShaderBuilder.finalShader
@@ -111,7 +112,8 @@ void main()
             result: "vertexTexCoord"
         }
 
-        shaderType: ShaderBuilder.Fragment
+        shaderType: ShaderBuilder.Vertex
+        renderPass: builderRenderPass
 
         sourceFile: "qrc:/ShaderNodes/shaders/gl3/shader_builder_material.vert"
 
@@ -137,6 +139,7 @@ void main()
         shaderType: ShaderBuilder.Fragment
 
         sourceFile: "qrc:/ShaderNodes/shaders/gl3/shader_builder_material.frag"
+        renderPass: builderRenderPass
 
 //        onFinalShaderChanged: console.log(finalShader)
 //        QQ2.Component.onCompleted: console.log(finalShader)

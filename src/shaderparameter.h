@@ -13,7 +13,7 @@ public:
 
     virtual QString generateHeader() const override;
     virtual QString generateBody() const override;
-    virtual bool setup(ShaderBuilder *shaderBuilder, QString tempIdentifier) override;
+    virtual ShaderNodeSetupResult setup(ShaderBuilder *shaderBuilder, QString tempIdentifier) override;
 
 private:
 };

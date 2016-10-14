@@ -52,47 +52,62 @@ ApplicationWindow {
                 camera: mainCamera
             }
 
-            NodeInstantiator {
-                model: 10
-                Entity {
-                    components: [
-                        mesh,
-                        transform1,
-                        material
-                    ]
+            Entity {
+                components: [
+                    mesh,
+                    transform1,
+                    material1
+                ]
 
-                    Material {
-                        id: material
+                Transform {
+                    id: transform1
+                    translation: Qt.vector3d(-4, 0, 0)
+                }
+            }
+            Entity {
+                components: [
+                    mesh,
+                    transform2,
+                    material2
+                ]
 
-                        effect: builderEffect
-
-                        parameters: [
-                            Parameter { name: param.identifier; value: index * 0.1 }
-//                            Parameter { name: "lol"; value: 12 }
-                        ]
-
-//                        ShaderBuilderMaterialBinding {
-//                            material: material
-//                            shaderBuilder: builderEffect.fragmentShaderBuilder
-//                        }
-
-//                        ShaderBuilderMaterialBinding {
-//                            material: material
-//                            shaderBuilder: builderEffect.vertexShaderBuilder
-//                        }
-                    }
-
-                    Transform {
-                        id: transform1
-                        translation: Qt.vector3d(index, 0, 0)
-                    }
+                Transform {
+                    id: transform2
+                    translation: Qt.vector3d(4, 0, 0)
                 }
             }
 
-            ShaderBuilderEffect {
-                id: builderEffect
+            Light {
+                id: light1
+                position: Qt.vector3d(0, slider.value * 8, -4)
+            }
+
+            Light {
+                id: light2
+                position: Qt.vector3d(0, 4, 4)
+            }
+
+            ShaderBuilderMaterial {
+                id: material1
+
                 fragmentColor: StandardMaterial {
-                    color: ShaderParameter { id: param }
+                    color: "green"
+                    lights: [
+                        light1,
+                        light2
+                    ]
+                }
+            }
+
+            ShaderBuilderMaterial {
+                id: material2
+
+                fragmentColor: StandardMaterial {
+                    color: "green"
+                    lights: [
+                        light1,
+                        light2
+                    ]
                 }
             }
 

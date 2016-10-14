@@ -5,6 +5,7 @@
 
 ShaderOutput::ShaderOutput(Qt3DCore::QNode *parent)
     : Qt3DCore::QNode(parent)
+    , m_node(this)
 {
 }
 

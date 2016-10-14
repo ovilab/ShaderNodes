@@ -1,41 +1,41 @@
-#ifndef SHADERBUILDERMATERIALBINDING_H
-#define SHADERBUILDERMATERIALBINDING_H
+//#ifndef SHADERBUILDERMATERIALBINDING_H
+//#define SHADERBUILDERMATERIALBINDING_H
 
-#include <QObject>
-#include <Qt3DCore/QNode>
-#include <Qt3DRender/QMaterial>
-#include "shaderbuilder.h"
+//#include <QObject>
+//#include <Qt3DCore/QNode>
+//#include <Qt3DRender/QMaterial>
+//#include "shaderbuilder.h"
 
-class ShaderBuilderMaterialBinding : public Qt3DCore::QNode
-{
-    Q_OBJECT
-    Q_PROPERTY(QMaterial* material READ material WRITE setMaterial NOTIFY materialChanged)
-    Q_PROPERTY(ShaderBuilder* shaderBuilder READ shaderBuilder WRITE setShaderBuilder NOTIFY shaderBuilderChanged)
+//class ShaderBuilderMaterialBinding : public Qt3DCore::QNode
+//{
+//    Q_OBJECT
+//    Q_PROPERTY(QMaterial* material READ material WRITE setMaterial NOTIFY materialChanged)
+//    Q_PROPERTY(ShaderBuilder* shaderBuilder READ shaderBuilder WRITE setShaderBuilder NOTIFY shaderBuilderChanged)
 
-public:
-    explicit ShaderBuilderMaterialBinding(Qt3DCore::QNode *parent = 0);
+//public:
+//    explicit ShaderBuilderMaterialBinding(Qt3DCore::QNode *parent = 0);
 
-    QMaterial* material() const;
-    ShaderBuilder* shaderBuilder() const;
+//    QMaterial* material() const;
+//    ShaderBuilder* shaderBuilder() const;
 
-signals:
+//signals:
 
-    void materialChanged(QMaterial* material);
+//    void materialChanged(QMaterial* material);
 
-    void shaderBuilderChanged(ShaderBuilder* shaderBuilder);
+//    void shaderBuilderChanged(ShaderBuilder* shaderBuilder);
 
-public slots:
+//public slots:
 
 
-    void setMaterial(QMaterial* material);
-    void setShaderBuilder(ShaderBuilder* shaderBuilder);
+//    void setMaterial(QMaterial* material);
+//    void setShaderBuilder(ShaderBuilder* shaderBuilder);
 
-private:
-    void clear();
-    void apply();
+//private:
+//    void clear();
+//    void apply();
 
-    QMaterial* m_material = nullptr;
-    ShaderBuilder* m_shaderBuilder = nullptr;
-};
+//    QMaterial* m_material = nullptr;
+//    ShaderBuilder* m_shaderBuilder = nullptr;
+//};
 
-#endif // SHADERBUILDERMATERIALBINDING_H
+//#endif // SHADERBUILDERMATERIALBINDING_H

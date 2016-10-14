@@ -38,7 +38,7 @@ void ShaderBuilderBinding::setDefaultValue(QVariant defaultValue)
     emit defaultValueChanged(defaultValue);
 }
 
-bool ShaderBuilderBinding::setup(ShaderBuilder *shaderBuilder, QString tempIdentifier)
+ShaderNodeSetupResult ShaderBuilderBinding::setup(ShaderBuilder *shaderBuilder, QString tempIdentifier)
 {
     QString currentIdentifier;
     if(!tempIdentifier.isEmpty()) {
@@ -57,13 +57,13 @@ bool ShaderBuilderBinding::setup(ShaderBuilder *shaderBuilder, QString tempIdent
         setResult("$(defaultValue, " + type() + ")");
         return ShaderNode::setup(shaderBuilder);
     }
+    const auto& nodeSetup = node->setup(shaderBuilder);
     m_resolvedDependencies.append(node);
-    node->setup(shaderBuilder);
+    m_resolvedDependencies.append(nodeSetup.m_dependencies);
     setType(node->type());
     m_resolvedSource = "";
-//    m_resolvedSource += type() + " " + currentIdentifier + ";\n";
     m_resolvedSource += currentIdentifier + " = " + ShaderUtils::convert(node->type(), type(), node->identifier()) + ";\n";
-    return true;
+    return nodeSetup;
 }
 
 QVariant ShaderBuilderBinding::defaultValue() const

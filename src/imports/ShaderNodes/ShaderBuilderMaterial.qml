@@ -18,14 +18,4 @@ Material {
     effect: ShaderBuilderEffect {
         id: shaderBuilderEffect
     }
-
-    ShaderBuilderMaterialBinding {
-        material: root
-        shaderBuilder: shaderBuilderEffect.fragmentShaderBuilder
-    }
-
-    ShaderBuilderMaterialBinding {
-        material: root
-        shaderBuilder: shaderBuilderEffect.vertexShaderBuilder
-    }
 }

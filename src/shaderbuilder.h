@@ -15,18 +15,6 @@
 
 using namespace Qt3DRender;
 
-class VariantShaderNode;
-
-struct UniformValue
-{
-    ShaderNode *node;
-    QString propertyName;
-    QString identifier;
-    QVariant value;
-    QString type;
-    QParameter *parameter;
-};
-
 class ShaderBuilder : public Qt3DCore::QNode
 {
     Q_OBJECT
@@ -37,8 +25,18 @@ class ShaderBuilder : public Qt3DCore::QNode
     Q_PROPERTY(QQmlListProperty<ShaderNode> inputs READ inputs CONSTANT)
     Q_PROPERTY(QQmlListProperty<ShaderOutput> outputs READ outputs CONSTANT)
     Q_PROPERTY(ShaderType shaderType READ shaderType WRITE setShaderType NOTIFY shaderTypeChanged)
+    Q_PROPERTY(Qt3DRender::QRenderPass* renderPass READ renderPass WRITE setRenderPass NOTIFY renderPassChanged)
 
 public:
+    enum class ShaderType {
+        Vertex,
+        Fragment,
+        Geometry,
+        Compute,
+        TessellationControl,
+        TessellationEvaluation
+    };
+
     explicit ShaderBuilder(QNode *parent = 0);
     virtual ~ShaderBuilder();
 
@@ -49,40 +47,27 @@ public:
     QQmlListProperty<ShaderOutput> outputs();
 
     QVariantMap uniforms() const;
-    void addUniform(ShaderNode *node, const QString &propertyName, const QString &identifier,
-                    const QVariant &value, QMetaProperty metaProperty);
+    void addUniform(ShaderUniformValue* uniform);
 
     QUrl sourceFile() const;
-
-    enum class ShaderType {
-        Vertex,
-        Fragment,
-        Geometry,
-        Compute,
-        TessellationControl,
-        TessellationEvaluation
-    };
-
     ShaderType shaderType() const;
 
 signals:
     void sourceChanged(QString source);
     void finalShaderChanged();
-    void uniformsChanged();
-
     void sourceFileChanged(QUrl sourceFile);
     void shaderTypeChanged(ShaderType shaderType);
     void clearBegin();
     void buildFinished();
+    void renderPassChanged(Qt3DRender::QRenderPass* renderPass);
 
 public slots:
     void rebuildShader();
     void setSource(QString source);
     void markDirty();
-    void updateUniform(int i);
-
     void setSourceFile(QUrl sourceFile);
     void setShaderType(ShaderType shaderType);
+    void setRenderPass(Qt3DRender::QRenderPass* renderPass);
 
 private:
     static void appendOutput(QQmlListProperty<ShaderOutput> *list, ShaderOutput *output);
@@ -101,17 +86,21 @@ private:
     QString m_source;
     QList<ShaderOutput*> m_outputs;
     QList<ShaderNode*> m_inputs;
-    QList<UniformValue> m_uniforms;
-    QList<QSignalMapper*> m_signalMappers;
     QUrl m_sourceFile;
     ShaderType m_shaderType = ShaderType::Vertex;
     QString m_finalShader;
+
     bool m_dirty = true;
+
+    Qt3DRender::QRenderPass* m_renderPass = nullptr;
+    QList<ShaderNode*> m_dependencies;
 
 public:
     QList<QPair<QString, QString>> m_shaderParameters;
+    QVector<ShaderUniformValue*> m_uniforms;
 
     friend class ShaderBuilderMaterialBinding;
+    Qt3DRender::QRenderPass* renderPass() const;
 };
 
 #endif // SHADERBUILDER_H

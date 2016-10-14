@@ -10,7 +10,8 @@ HEADERS += \
     $$PWD/src/shaderutils.h \
     $$PWD/src/shadernodesplugin.h \
     $$PWD/src/shaderbuildermaterialbinding.h \
-    $$PWD/src/shaderparameter.h
+    $$PWD/src/shaderparameter.h \
+    $$PWD/src/shaderuniformvalue.h
 
 SOURCES += \
     $$PWD/src/shaderbuilder.cpp \
@@ -20,7 +21,8 @@ SOURCES += \
     $$PWD/src/shaderutils.cpp \
     $$PWD/src/shadernodesplugin.cpp \
     $$PWD/src/shaderbuildermaterialbinding.cpp \
-    $$PWD/src/shaderparameter.cpp
+    $$PWD/src/shaderparameter.cpp \
+    $$PWD/src/shaderuniformvalue.cpp
 
 RESOURCES += \
     $$PWD/src/imports/shadernodes_imports.qrc

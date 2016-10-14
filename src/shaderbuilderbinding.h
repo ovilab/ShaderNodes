@@ -16,7 +16,7 @@ class ShaderBuilderBinding : public ShaderNode
 public:
     explicit ShaderBuilderBinding(Qt3DCore::QNode *parent = 0);
 
-    virtual bool setup(ShaderBuilder *shaderBuilder, QString tempIdentifier = QString()) override;
+    virtual ShaderNodeSetupResult setup(ShaderBuilder *shaderBuilder, QString tempIdentifier = QString()) override;
     QVariant defaultValue() const;
     QString propertyName() const;
 
