@@ -15,8 +15,6 @@ Effect {
     property alias fragmentColor: _fragmentColor.value
     property alias vertexPosition: _position.value
 
-    QQ2.Component.onCompleted: console.log("Created effect")
-
     techniques: [
         Technique {
             graphicsApiFilter {
