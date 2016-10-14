@@ -93,7 +93,7 @@ private:
     bool m_dirty = true;
 
     Qt3DRender::QRenderPass* m_renderPass = nullptr;
-    QList<ShaderNode*> m_dependencies;
+    QSet<ShaderNode*> m_dependencies;
 
 public:
     QList<QPair<QString, QString>> m_shaderParameters;

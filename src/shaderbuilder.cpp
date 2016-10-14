@@ -177,8 +177,8 @@ void ShaderBuilder::rebuildShader()
             clear();
             return;
         }
-        m_dependencies.append(output->node());
-        m_dependencies.append(result.m_dependencies);
+        m_dependencies.insert(output->node());
+        m_dependencies.unite(result.m_dependencies);
     }
 
     for(const auto& node : m_dependencies) {

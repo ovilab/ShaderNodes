@@ -67,6 +67,28 @@ QString ShaderNode::generateHeader() const
     return headerResult;
 }
 
+QString ShaderNode::generateBody() const
+{
+    if(m_hasGeneratedBody) {
+        return QString();
+    }
+    if(m_type.isEmpty()) {
+        qWarning() << "WARNING: ShaderNode::generateBody(): " << m_name << "is missing type.";
+        return QString();
+    }
+    QString body = "";
+    for(ShaderNode* dependency : m_resolvedDependencies) {
+        body += dependency->generateBody();
+    }
+    body += ShaderUtils::precisionQualifier(m_type) + " " + m_type + " " + identifier() + ";\n";
+    if(!m_resolvedSource.isEmpty()) {
+        body += m_resolvedSource + "\n";
+    }
+    body += "\n";
+    m_hasGeneratedBody = true;
+    return body;
+}
+
 QString ShaderNode::convert(const QString &targetType, const QString &identifier) const
 {
     QString v = identifier;
@@ -140,11 +162,11 @@ ShaderNodeSetupResult ShaderNode::setup(ShaderBuilder* shaderBuilder, QString te
     }
     if(!m_requirement) {
         qWarning() << "WARNING: ShaderNode::setup(): Requirement for" << this << name() << "is not satisfied.";
-        return {false, QList<ShaderNode*>()};
+        return {false, QSet<ShaderNode*>()};
     }
     if(m_type.isEmpty()) {
         qWarning() << "WARNING: ShaderNode::setup(): " << name() << "is missing type.";
-        return {false, QList<ShaderNode*>()};
+        return {false, QSet<ShaderNode*>()};
     }
     QString currentIdentifier;
     if(tempIdentifier.isEmpty()) {
@@ -168,10 +190,10 @@ ShaderNodeSetupResult ShaderNode::setup(ShaderBuilder* shaderBuilder, QString te
         }
         const auto &dependencySetup = dependency->setup(shaderBuilder);
         if(!dependencySetup.m_ok) {
-            return {false, QList<ShaderNode*>()};
+            return {false, QSet<ShaderNode*>()};
         }
-        m_resolvedDependencies.append(dependency);
-        m_resolvedDependencies.append(dependencySetup.m_dependencies);
+        m_resolvedDependencies.insert(dependency);
+        m_resolvedDependencies.unite(dependencySetup.m_dependencies);
     }
 
     // TODO old signal mappers need to be deleted at some point
@@ -289,8 +311,8 @@ ShaderNodeSetupResult ShaderNode::setup(ShaderBuilder* shaderBuilder, QString te
                     if(ShaderNode *node = qvariant_cast<ShaderNode*>(listValue)) {
                         const auto &nodeSetup = node->setup(shaderBuilder);
                         success = success && nodeSetup.m_ok;
-                        m_resolvedDependencies.append(node);
-                        m_resolvedDependencies.append(nodeSetup.m_dependencies);
+                        m_resolvedDependencies.insert(node);
+                        m_resolvedDependencies.unite(nodeSetup.m_dependencies);
                         targetIdentifier = node->identifier();
                         sourceType = node->type();
                     } else {
@@ -323,12 +345,12 @@ ShaderNodeSetupResult ShaderNode::setup(ShaderBuilder* shaderBuilder, QString te
                     ShaderNode *node = qobject_cast<ShaderNode*>(object);
                     if(!node) {
                         qWarning() << "ERROR: Could not convert listed object to ShaderNode:" << object;
-                        return {false, QList<ShaderNode*>()};
+                        return {false, QSet<ShaderNode*>()};
                     }
                     const auto& nodeSetup = node->setup(shaderBuilder);
                     success = success && nodeSetup.m_ok;
-                    m_resolvedDependencies.append(node);
-                    m_resolvedDependencies.append(nodeSetup.m_dependencies);
+                    m_resolvedDependencies.insert(node);
+                    m_resolvedDependencies.unite(nodeSetup.m_dependencies);
                     QString targetIdentifier = node->identifier();
                     QString sourceType = node->type();
                     // replaces '$property' or '$(property, type)'
@@ -346,8 +368,8 @@ ShaderNodeSetupResult ShaderNode::setup(ShaderBuilder* shaderBuilder, QString te
             if(node) {
                 const auto& nodeSetup = node->setup(shaderBuilder);
                 success = success && nodeSetup.m_ok;
-                m_resolvedDependencies.append(node);
-                m_resolvedDependencies.append(nodeSetup.m_dependencies);
+                m_resolvedDependencies.insert(node);
+                m_resolvedDependencies.unite(nodeSetup.m_dependencies);
                 targetIdentifier = node->identifier();
                 sourceType = node->type();
             } else {
@@ -370,28 +392,6 @@ ShaderNodeSetupResult ShaderNode::setup(ShaderBuilder* shaderBuilder, QString te
     }
     m_resolvedSource = sourceContent;
     return {success, m_resolvedDependencies};
-}
-
-QString ShaderNode::generateBody() const
-{
-    if(m_hasGeneratedBody) {
-        return QString();
-    }
-    if(m_type.isEmpty()) {
-        qWarning() << "WARNING: ShaderNode::generateBody(): " << m_name << "is missing type.";
-        return QString();
-    }
-    QString body = "";
-    for(ShaderNode* dependency : m_resolvedDependencies) {
-        body += dependency->generateBody();
-    }
-    body += ShaderUtils::precisionQualifier(m_type) + " " + m_type + " " + identifier() + ";\n";
-    if(!m_resolvedSource.isEmpty()) {
-        body += m_resolvedSource + "\n";
-    }
-    body += "\n";
-    m_hasGeneratedBody = true;
-    return body;
 }
 
 void ShaderNode::reset() const

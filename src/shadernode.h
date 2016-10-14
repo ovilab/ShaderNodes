@@ -21,7 +21,7 @@ class ShaderBuilder;
 struct ShaderNodeSetupResult
 {
     bool m_ok;
-    QList<ShaderNode*> m_dependencies;
+    QSet<ShaderNode*> m_dependencies;
 };
 
 class ShaderNode : public Qt3DCore::QNode
@@ -120,7 +120,7 @@ protected: // TODO make private
     QString m_exportedTypeName;
 
     QString m_resolvedSource;
-    QList<ShaderNode*> m_resolvedDependencies;
+    QSet<ShaderNode*> m_resolvedDependencies;
     QList<ShaderNode*> m_declaredDependencies;
     QVector<ShaderUniformValue*> m_uniforms;
     QMap<int, QString> m_propertyTypeNames;

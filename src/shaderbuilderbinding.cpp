@@ -58,8 +58,8 @@ ShaderNodeSetupResult ShaderBuilderBinding::setup(ShaderBuilder *shaderBuilder, 
         return ShaderNode::setup(shaderBuilder);
     }
     const auto& nodeSetup = node->setup(shaderBuilder);
-    m_resolvedDependencies.append(node);
-    m_resolvedDependencies.append(nodeSetup.m_dependencies);
+    m_resolvedDependencies.insert(node);
+    m_resolvedDependencies.unite(nodeSetup.m_dependencies);
     setType(node->type());
     m_resolvedSource = "";
     m_resolvedSource += currentIdentifier + " = " + ShaderUtils::convert(node->type(), type(), node->identifier()) + ";\n";

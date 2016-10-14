@@ -68,18 +68,7 @@ ApplicationWindow {
 
                         parameters: [
                             Parameter { name: param.identifier; value: index * 0.1 }
-//                            Parameter { name: "lol"; value: 12 }
                         ]
-
-//                        ShaderBuilderMaterialBinding {
-//                            material: material
-//                            shaderBuilder: builderEffect.fragmentShaderBuilder
-//                        }
-
-//                        ShaderBuilderMaterialBinding {
-//                            material: material
-//                            shaderBuilder: builderEffect.vertexShaderBuilder
-//                        }
                     }
 
                     Transform {

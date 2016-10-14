@@ -8,8 +8,12 @@ ShaderParameter::ShaderParameter(ShaderNode *parent)
 
 QString ShaderParameter::generateHeader() const
 {
+    if(m_hasGeneratedHeader) {
+        return QString();
+    }
     QString header;
     header += QString("uniform ") + type() + " " + identifier() + ";\n";
+    m_hasGeneratedHeader = true;
     return header;
 }
 
@@ -22,5 +26,5 @@ ShaderNodeSetupResult ShaderParameter::setup(ShaderBuilder *shaderBuilder, QStri
 {
     Q_UNUSED(shaderBuilder)
     Q_UNUSED(tempIdentifier)
-    return {true, QList<ShaderNode*>()};
+    return {true, QSet<ShaderNode*>()};
 }
