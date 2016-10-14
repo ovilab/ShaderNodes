@@ -101,6 +101,7 @@ public:
 
     friend class ShaderBuilderMaterialBinding;
     Qt3DRender::QRenderPass* renderPass() const;
+    void disconnectDependencies();
 };
 
 #endif // SHADERBUILDER_H

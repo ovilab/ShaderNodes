@@ -22,7 +22,20 @@ ShaderBuilder::ShaderBuilder(QNode *parent)
 
 ShaderBuilder::~ShaderBuilder()
 {
-    clear();
+    disconnectDependencies();
+}
+
+void ShaderBuilder::disconnectDependencies()
+{
+    for(const auto& node : m_dependencies) {
+        disconnect(node, &ShaderNode::headerChanged, this, &ShaderBuilder::markDirty);
+        disconnect(node, &ShaderNode::resultChanged, this, &ShaderBuilder::markDirty);
+        disconnect(node, &ShaderNode::sourceChanged, this, &ShaderBuilder::markDirty);
+        disconnect(node, &ShaderNode::typeChanged, this, &ShaderBuilder::markDirty);
+        disconnect(node, &ShaderNode::identifierChanged, this, &ShaderBuilder::markDirty);
+        disconnect(node, &ShaderNode::propertyTypeChanged, this, &ShaderBuilder::markDirty);
+        disconnect(node, &ShaderNode::markDirty, this, &ShaderBuilder::markDirty);
+    }
 }
 
 void ShaderBuilder::clear()
@@ -35,15 +48,7 @@ void ShaderBuilder::clear()
         }
     }
 
-    for(const auto& node : m_dependencies) {
-        disconnect(node, &ShaderNode::headerChanged, this, &ShaderBuilder::markDirty);
-        disconnect(node, &ShaderNode::resultChanged, this, &ShaderBuilder::markDirty);
-        disconnect(node, &ShaderNode::sourceChanged, this, &ShaderBuilder::markDirty);
-        disconnect(node, &ShaderNode::typeChanged, this, &ShaderBuilder::markDirty);
-        disconnect(node, &ShaderNode::identifierChanged, this, &ShaderBuilder::markDirty);
-        disconnect(node, &ShaderNode::propertyTypeChanged, this, &ShaderBuilder::markDirty);
-        disconnect(node, &ShaderNode::markDirty, this, &ShaderBuilder::markDirty);
-    }
+    disconnectDependencies();
 
     m_dependencies.clear();
 
