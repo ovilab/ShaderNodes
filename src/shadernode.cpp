@@ -380,10 +380,15 @@ ShaderNodeSetupResult ShaderNode::setup(ShaderBuilder* shaderBuilder, QString te
                 continue;
             }
             // replaces '$property' or '$(property, type)'
-            QRegularExpression namedTargetRegex("\\$(\\(\\s*)?" + propertyName + "\\b(\\s*,\\s*" + targetType + "\\s*\\))?");
-            sourceContent.replace(namedTargetRegex, ShaderUtils::convert(sourceType, targetType, targetIdentifier));
+            if(targetType.isEmpty()) { // TODO do similar splits for indexed and others
+                QRegularExpression namedTargetRegex("\\$(\\(\\s*)?" + propertyName + "\\b");
+                sourceContent.replace(namedTargetRegex, targetIdentifier);
+            } else {
+                QRegularExpression namedTargetRegex("\\$(\\(\\s*)?" + propertyName + "\\b\\s*,\\s*" + targetType + "\\s*\\)");
+                sourceContent.replace(namedTargetRegex, ShaderUtils::convert(sourceType, targetType, targetIdentifier));
+            }
 
-            alreadyReplaced.append(propertyName);
+//            alreadyReplaced.append(propertyName);
         }
     }
 

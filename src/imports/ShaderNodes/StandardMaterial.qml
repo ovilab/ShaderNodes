@@ -36,13 +36,14 @@ ShaderNode {
     arrayProperties: ["lights"]
 
     name: "diffuse"
-    type: "vec3"
+    type: "vec4"
     source: {
         var output = ""
-        output += "$this = vec3(0.0, 0.0, 0.0);\n"
+        output += "$this = vec4(0.0, 0.0, 0.0, 0.0);\n"
+        output += "$this.a = $(diffuseColor, vec4).a;\n"
 
         for(var i in lights) {
-            output += "$this += standardMaterialLight($lights[" + i + "], $(normal, vec3), $(position, vec3), eyePosition,\n"
+            output += "$this.xyz += standardMaterialLight($lights[" + i + "], $(normal, vec3), $(position, vec3), eyePosition,\n"
             output += "             $(ambientColor, vec3), $(diffuseColor, vec3), $(specularColor, vec3),\n"
             output += "             0.01 * $(ambientIntensity, float), $(diffuseIntensity, float), 0.01 * $(specularIntensity, float),\n"
             output += "             150.0 * $(hardness, float), $(attenuationOffset, float));\n"

@@ -7,6 +7,8 @@ AmbientOcclusion 1.0 AmbientOcclusion.qml
 Bump 1.0 Bump.qml
 Clamp 1.0 Clamp.qml
 CombineRgb 1.0 CombineRgb.qml
+CombineRgba 1.0 CombineRgba.qml
+CombineRgbVectorAlpha 1.0 CombineRgbVectorAlpha.qml
 Decolorize 1.0 Decolorize.qml
 Displacement 1.0 Displacement.qml
 Function 1.0 Function.qml

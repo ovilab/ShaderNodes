@@ -10,6 +10,13 @@ import QtQuick.Scene3D 2.0
 Effect {
     id: root
 
+    property int sourceRgbArg: BlendEquationArguments.SourceAlpha
+    property int destinationRgbArg: BlendEquationArguments.OneMinusSourceAlpha
+    property int sourceAlphaArg: BlendEquationArguments.SourceAlpha
+    property int destinationAlphaArg: BlendEquationArguments.OneMinusSourceAlpha
+
+    property int blendFunctionArg: BlendEquation.Add
+
     property alias fragmentShaderBuilder: fragmentShaderBuilder
     property alias vertexShaderBuilder: vertexShaderBuilder
     property alias fragmentColor: _fragmentColor.value
@@ -32,7 +39,18 @@ Effect {
                 shaderProgram: ShaderProgram {
                     vertexShaderCode: vertexShaderBuilder.finalShader
                     fragmentShaderCode: fragmentShaderBuilder.finalShader
-                }
+                }               
+                renderStates: [
+                    BlendEquationArguments {
+                        sourceRgb: sourceRgbArg
+                        destinationRgb: destinationRgbArg
+                        sourceAlpha: sourceAlphaArg
+                        destinationAlpha: destinationAlphaArg
+                    },
+                    BlendEquation {
+                        blendFunction: blendFunctionArg
+                    }
+                ]
             }
         },
         Technique {
