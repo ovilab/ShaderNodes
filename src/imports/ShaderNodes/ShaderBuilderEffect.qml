@@ -20,6 +20,7 @@ Effect {
     property alias fragmentShaderBuilder: fragmentShaderBuilder
     property alias vertexShaderBuilder: vertexShaderBuilder
     property alias fragmentColor: _fragmentColor.value
+    property alias deferredColor: deferredColor.value
     property alias vertexPosition: _position.value
 
     techniques: [
@@ -71,7 +72,6 @@ in vec4 vertexPosition;
 in vec3 vertexNormal;
 out vec3 normal0;
 out vec3 position0;
-out vec4 color0;
 uniform mat4 mvp;
 uniform mat4 modelMatrix;
 uniform mat4 modelView;
@@ -80,7 +80,6 @@ uniform mat3 modelViewNormal;
 uniform vec4 meshColor;
 void main()
 {
-    color0 = vec4(1.0, 0.0, 0.0, 1.0);
     position0 = (modelMatrix * vec4(vertexPosition.xyz, 1.0)).xyz ;
     normal0 = modelNormalMatrix * vertexNormal;
     gl_Position = mvp * vertexPosition;
@@ -193,7 +192,6 @@ void main()
         source: "#version 330
 in vec3 normal0;
 in vec3 position0;
-in vec4 color0;
 
 out vec4 normal;
 out vec4 position;
@@ -227,6 +225,14 @@ void main()
                 result: "normal"
             }
         ]
-        outputs: fragmentShaderBuilder.outputs
+
+        outputs: [
+            ShaderOutput {
+                id: deferredColor
+                type: "vec4"
+                name: "fragColor"
+                value: "purple"
+            }
+        ]
     }
 }
