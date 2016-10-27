@@ -62,6 +62,7 @@ Effect {
             }
             filterKeys: FilterKey { name: "renderingStyle"; value: "deferred" }
             renderPasses: RenderPass {
+                id: deferredGeometryRenderPass
                 filterKeys: FilterKey { name: "pass"; value: "geometry" }
                 shaderProgram : ShaderProgram {
                     vertexShaderCode:
@@ -84,27 +85,7 @@ void main()
     normal0 = modelNormalMatrix * vertexNormal;
     gl_Position = mvp * vertexPosition;
 }"
-                    fragmentShaderCode:
-                        "#version 330
-in vec3 normal0;
-in vec3 position0;
-in vec4 color0;
-
-out vec4 normal;
-out vec4 position;
-out vec4 color;
-
-uniform vec3 eyePosition;
-uniform vec3 viewVector;
-void main()
-{
-    color = color0;
-    float posMin = -100; // TODO should be set as uniforms
-    float posMax = 100;
-    float deltaMaxMin = posMax - posMin;
-    position = vec4((position0-eyePosition-posMin) / deltaMaxMin, 1.0);
-    normal = vec4((normalize(normal0) + 1.0) / 2.0, 1.0);
-}"
+                    fragmentShaderCode: deferredFragmentShaderBuilder.finalShader
                 }
             }
         }
@@ -203,5 +184,49 @@ void main()
                 value: "purple"
             }
         ]
+    }
+    ShaderBuilder {
+        id: deferredFragmentShaderBuilder
+
+        shaderType: ShaderBuilder.Fragment
+
+        source: "#version 330
+in vec3 normal0;
+in vec3 position0;
+in vec4 color0;
+
+out vec4 normal;
+out vec4 position;
+out vec4 fragColor;
+
+uniform vec3 eyePosition;
+uniform vec3 viewVector;
+
+#pragma shadernodes header
+
+void main()
+{
+    float posMin = -100; // TODO should be set as uniforms
+    float posMax = 100;
+    float deltaMaxMin = posMax - posMin;
+    position = vec4((position0-eyePosition-posMin) / deltaMaxMin, 1.0);
+    normal = vec4((normalize(normal0) + 1.0) / 2.0, 1.0);
+
+#pragma shadernodes body
+}"
+        renderPass: deferredGeometryRenderPass
+        inputs: [
+            ShaderNode {
+                type: "vec3"
+                name: "position"
+                result: "position"
+            },
+            ShaderNode {
+                type: "vec3"
+                name: "normal"
+                result: "normal"
+            }
+        ]
+        outputs: fragmentShaderBuilder.outputs
     }
 }
