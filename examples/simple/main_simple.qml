@@ -56,7 +56,7 @@ ApplicationWindow {
                 components: [
                     ShaderBuilderMaterial {
                         id: material
-                        fragmentColor: StandardMaterial {
+                        surface: StandardSurface {
                             color: "green"
                             normal: Bump {
                                 texture: Noise {

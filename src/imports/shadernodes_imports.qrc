@@ -40,5 +40,6 @@
         <file>ShaderNodes/ShaderBuilderEffect.qml</file>
         <file>ShaderNodes/CombineRgba.qml</file>
         <file>ShaderNodes/CombineRgbVectorAlpha.qml</file>
+        <file>ShaderNodes/StandardSurface.qml</file>
     </qresource>
 </RCC>
