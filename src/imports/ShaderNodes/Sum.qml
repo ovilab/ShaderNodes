@@ -1,18 +1,31 @@
+import QtQuick 2.0 as QQ2
+
 import ShaderNodes 1.0
 
 ShaderNode {
-    property list<ShaderNode> inputs
+    id: root
 
+    property var values: [0.5]
+
+    arrayProperties: ["values"]
     exportedTypeName: "Sum"
 
-    type: "float"
+    name: "sum"
+    type: ShaderNodes.glslType(values)
+
     source: {
-        var output = "";
-        output += "float $sumresult = 0.0;\n"
-        for(var i in inputs) {
-            output += "$sumresult += $(inputs[" + i + "], float);\n";
+        var result = ""
+        result += type + " $sumresult = 0.0;\n"
+        if(values && values.length) {
+            for(var i in values) {
+                result += "$sumresult += $(values[" + i + "], " + type + ");\n"
+            }
+        } else {
+            result += "$sumresult = $values;\n"
         }
-        return output
+
+        return result;
     }
+
     result: "$sumresult"
 }

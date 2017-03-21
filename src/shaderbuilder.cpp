@@ -22,7 +22,6 @@ ShaderBuilder::ShaderBuilder(QNode *parent)
 
 ShaderBuilder::~ShaderBuilder()
 {
-    disconnectDependencies();
 }
 
 void ShaderBuilder::disconnectDependencies()

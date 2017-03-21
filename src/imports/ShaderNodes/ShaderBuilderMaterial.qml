@@ -10,6 +10,7 @@ import QtQuick.Scene3D 2.0
 Material {
     id: root
     property alias fragmentColor: shaderBuilderEffect.fragmentColor
+    property alias deferredColor: shaderBuilderEffect.deferredColor
     property alias vertexPosition: shaderBuilderEffect.vertexPosition
 
     property alias vertex: shaderBuilderEffect.vertexShaderBuilder

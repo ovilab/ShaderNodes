@@ -1,31 +1,31 @@
-import QtQuick 2.0 as QQ2
-
 import ShaderNodes 1.0
 
 ShaderNode {
-    id: root
+    property var value1: 0.0
+    property var value2: 0.0
+    property var mix: 0.5
 
-    property var values: [0.5]
-
-    arrayProperties: ["values"]
     exportedTypeName: "Add"
 
     name: "add"
-    type: ShaderNodes.glslType(values)
-
-    source: {
-        var result = ""
-        result += type + " $sumresult = 0.0;\n"
-        if(values && values.length) {
-            for(var i in values) {
-                result += "$sumresult += $(values[" + i + "], " + type + ");\n"
-            }
-        } else {
-            result += "$sumresult = $values;\n"
+    type: {
+        var type1 = glslType(value1)
+        var type2 = glslType(value2)
+        if(type1 === type2) {
+            return type1
         }
-
-        return result;
+        if(type1 === "float") {
+            return type2
+        }
+        if(type2 === "float") {
+            return type1
+        }
+        return type1
     }
 
-    result: "$sumresult"
+    result: {
+        var type1 = glslType(value1)
+        var type2 = glslType(value2)
+        return "$(value1, " + type + ") + $(value2, " + type + ")"
+    }
 }

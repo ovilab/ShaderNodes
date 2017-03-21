@@ -23,6 +23,10 @@ void ShaderUniformValue::updateValue()
 {
     QByteArray name = m_propertyName.toUtf8();
     QVariant value = m_node->property(name.constData());
+    if(!value.isValid()) {
+        // TODO consider throwing a warning
+        value = 0.0;
+    }
     if(value.type() == QVariant::String) {
         value = QColor(value.toString());
     }
