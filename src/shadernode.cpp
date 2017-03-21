@@ -13,7 +13,27 @@
 #include <QQmlFile>
 #include <QFile>
 
-const QStringList builtinNames = QStringList{"objectName","parent","enabled","name","type","result","source","header","identifier","headerFile","requirement","dependencies","data","childNodes","exportedTypeName","arrayProperties", "headerFiles"};
+const QStringList builtinNames = QStringList{
+        "objectName",
+        "parent",
+        "enabled",
+        "name",
+        "type",
+        "result",
+        "source",
+        "header",
+        "identifier",
+        "headerFile",
+        "requirement",
+        "dependencies",
+        "data",
+        "childNodes",
+        "exportedTypeName",
+        "arrayProperties",
+        "headerFiles",
+        "propertyTrackMode",
+        "trackedProperties"
+    };
 
 ShaderNode::ShaderNode(Qt3DCore::QNode *parent)
     : Qt3DCore::QNode(parent)
@@ -138,7 +158,7 @@ QString ShaderNode::createUniform(const QString &propertyName, const QVariant &v
     QString uniformPrefix = "node_uniform";
     QString targetIdentifier =  uniformPrefix + "_" + propertyNameNoUnderscores + "_" + ShaderUtils::generateName();
 
-    ShaderUniformValue *uniform = new ShaderUniformValue(this, propertyName, targetIdentifier, value);
+    ShaderUniformValue *uniform = new ShaderUniformValue(propertyName, targetIdentifier, value, this);
 
     if(!metaProperty.hasNotifySignal()) {
         qWarning() << "WARNING: ShaderBuilder::addUniform(): Property" << propertyName << "on" << name()
@@ -150,7 +170,7 @@ QString ShaderNode::createUniform(const QString &propertyName, const QVariant &v
 
     m_uniforms.append(uniform);
 
-    shaderBuilder->addUniform(uniform);
+//    shaderBuilder->addUniform(uniform);
 
     return targetIdentifier;
 }
@@ -182,7 +202,21 @@ ShaderNodeSetupResult ShaderNode::setup(ShaderBuilder* shaderBuilder, QString te
         sourceContent += currentIdentifier + " = " + m_result + ";\n";
     }
 
+    // Cleanup
+    qDeleteAll(m_uniforms);
+    m_uniforms.clear();
+
     m_resolvedDependencies.clear();
+
+    // TODO old signal mappers need to be deleted at some point
+    for(QSignalMapper *mapper : m_signalMappers) {
+        disconnect(this, 0, mapper, SLOT(map()));
+        disconnect(mapper, SIGNAL(mapped(int)), this, SLOT(handlePropertyChange(int)));
+        mapper->deleteLater();
+    }
+    m_signalMappers.clear();
+
+    // End cleanup
 
     for(ShaderNode *dependency : m_declaredDependencies) {
         if(dependency == this) {
@@ -195,14 +229,6 @@ ShaderNodeSetupResult ShaderNode::setup(ShaderBuilder* shaderBuilder, QString te
         m_resolvedDependencies.insert(dependency);
         m_resolvedDependencies.unite(dependencySetup.m_dependencies);
     }
-
-    // TODO old signal mappers need to be deleted at some point
-    for(QSignalMapper *mapper : m_signalMappers) {
-        disconnect(this, 0, mapper, SLOT(map()));
-        disconnect(mapper, SIGNAL(mapped(int)), this, SLOT(handlePropertyChange(int)));
-        mapper->deleteLater();
-    }
-    m_signalMappers.clear();
 
     QStringList propertiesInSource;
     // matches '$property' or '$(property, type)'

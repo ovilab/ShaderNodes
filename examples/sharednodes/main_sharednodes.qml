@@ -52,18 +52,18 @@ ApplicationWindow {
                 camera: mainCamera
             }
 
-            Entity {
-                components: [
-                    mesh,
-                    transform1,
-                    material1
-                ]
+//            Entity {
+//                components: [
+//                    mesh,
+//                    transform1,
+//                    material1
+//                ]
 
-                Transform {
-                    id: transform1
-                    translation: Qt.vector3d(-4, 0, 0)
-                }
-            }
+//                Transform {
+//                    id: transform1
+//                    translation: Qt.vector3d(-4, 0, 0)
+//                }
+//            }
             Entity {
                 components: [
                     mesh,
@@ -87,27 +87,34 @@ ApplicationWindow {
                 position: Qt.vector3d(0, 4, 4)
             }
 
-            ShaderBuilderMaterial {
-                id: material1
+//            ShaderBuilderMaterial {
+//                id: material1
 
-                fragmentColor: StandardMaterial {
-                    color: "green"
-                    lights: [
-                        light1,
-                        light2
-                    ]
-                }
-            }
+//                fragmentColor: StandardMaterial {
+//                    color: "green"
+//                    lights: [
+//                        light1,
+//                        light2
+//                    ]
+//                }
+//            }
 
             ShaderBuilderMaterial {
                 id: material2
 
-                fragmentColor: StandardMaterial {
-                    color: "green"
-                    lights: [
-                        light1,
-                        light2
-                    ]
+//                fragmentColor: StandardMaterial {
+//                    id: standardMaterial2
+//                    color: "green"
+//                    lights: [
+//                        light1,
+//                        light2
+//                    ]
+//                }
+
+                fragmentColor: Mix {
+                    id: standardMaterial2
+                    value1: 1.0
+                    value2: Qt.vector3d(0.1, 0.1, 0.1)
                 }
             }
 
@@ -123,5 +130,51 @@ ApplicationWindow {
             value: 0.5
             width: 300
         }
+
+        Timer {
+            property ShaderNode node: null
+            running: true
+            repeat: true
+            interval: 60
+            onTriggered: {
+                if(node) {
+                    standardMaterial2.value1 = 2.3
+                    standardMaterial2.value1 = Qt.vector3d(2.0, 1.0, 2.0)
+                    node.destroy()
+                    node = null
+                } else {
+                    var object = Qt.createQmlObject("import ShaderNodes 1.0; Mix {}", material2)
+                    standardMaterial2.value1 = object
+                    node = object
+                }
+            }
+        }
+
+//        Timer {
+//            running: true
+//            repeat: true
+//            interval: 100
+//            onTriggered: {
+//                standardMaterial2.value1 = 1.0
+//            }
+//        }
+
+//        Timer {
+//            running: true
+//            repeat: true
+//            interval: 150
+//            onTriggered: {
+//                standardMaterial2.value1 = node
+//            }
+//        }
+
+//        Timer {
+//            running: true
+//            repeat: true
+//            interval: 180
+//            onTriggered: {
+//                standardMaterial2.value1 = Qt.vector3d(1.0, 0.5, 0.1)
+//            }
+//        }
     }
 }

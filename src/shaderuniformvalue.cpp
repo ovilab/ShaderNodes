@@ -3,17 +3,19 @@
 #include "shaderutils.h"
 #include "shadernode.h"
 
-ShaderUniformValue::ShaderUniformValue(ShaderNode *parent,
-                                       const QString &propertyName,
+#include <QDebug>
+
+ShaderUniformValue::ShaderUniformValue(const QString &propertyName,
                                        const QString &identifier,
-                                       const QVariant &value)
+                                       const QVariant &value,
+                                       ShaderNode *parent)
     : Qt3DCore::QNode(parent)
     , m_node(parent)
     , m_propertyName(propertyName)
     , m_identifier(identifier)
     , m_value(value)
     , m_type(ShaderUtils::glslType(m_value))
-    , m_parameter(new Qt3DRender::QParameter(identifier, value, this))
+    , m_parameter(new Qt3DRender::QParameter(identifier, value))
 {
 }
 

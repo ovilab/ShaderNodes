@@ -2,4 +2,5 @@ TEMPLATE = subdirs
 
 SUBDIRS += \
     sharedmaterials \
-    sharednodes
+    sharednodes \
+    simple

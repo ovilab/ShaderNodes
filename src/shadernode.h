@@ -75,6 +75,7 @@ public:
     QStringList arrayProperties() const;
     QList<QUrl> headerFiles() const;
     QVector<Qt3DRender::QParameter*> parameters() const;
+    QMutex m_mutex;
 
 signals:
     void nameChanged(QString name);
@@ -137,6 +138,8 @@ private:
     QString createUniform(const QString &propertyName, const QVariant &value, ShaderBuilder *shaderBuilder);
     QStringList m_arrayProperties;
     QList<QUrl> m_headerFiles;
+
+    friend class ShaderBuilder;
 };
 
 #endif // SHADERNODE_H

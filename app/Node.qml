@@ -51,12 +51,6 @@ Item {
         updateHandleConnectionPoints()
     }
 
-    function reloadShaderNode() {
-//        var tmp = loader.source
-//        loader.source = ""
-//        loader.source = tmp
-    }
-
     function updateHandleConnectionPoints() {
         for(var i in allHandles) {
             var handle = allHandles[i]
@@ -70,7 +64,6 @@ Item {
             console.log(handleComponent.errorString())
             return
         }
-//        var glslType = ShaderNodes.glslType(value)
         var properties = {
             name: name,
             identifier: name,
@@ -141,8 +134,6 @@ Item {
         outputHandles = newOutputHandles
 
         allHandles = inputHandles.concat(outputHandles)
-
-//        object.destroy()
 
         updateHandleConnectionPoints()
     }

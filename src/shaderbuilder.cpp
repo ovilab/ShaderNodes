@@ -47,12 +47,12 @@ void ShaderBuilder::clear()
             m_renderPass->removeParameter(uniform->m_parameter);
         }
     }
+    m_uniforms.clear();
 
     disconnectDependencies();
 
     m_dependencies.clear();
 
-    m_uniforms.clear();
     m_finalShader = "";
 }
 
@@ -194,13 +194,15 @@ void ShaderBuilder::rebuildShader()
         connect(node, &ShaderNode::identifierChanged, this, &ShaderBuilder::markDirty);
         connect(node, &ShaderNode::propertyTypeChanged, this, &ShaderBuilder::markDirty);
         connect(node, &ShaderNode::markDirty, this, &ShaderBuilder::markDirty);
-    }
 
-    if(m_renderPass) {
-        for(const ShaderUniformValue *uniform : m_uniforms) {
-            m_renderPass->addParameter(uniform->m_parameter);
+        if(m_renderPass) {
+            for(ShaderUniformValue *uniform : node->m_uniforms) {
+                m_uniforms.append(uniform);
+                m_renderPass->addParameter(uniform->m_parameter);
+            }
         }
     }
+
 
     QString header = "";
     header += "\n// ------  begin generated header  ------\n\n";

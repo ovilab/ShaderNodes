@@ -10,10 +10,10 @@ class ShaderUniformValue : public Qt3DCore::QNode
 {
     Q_OBJECT
 public:
-    explicit ShaderUniformValue(ShaderNode* parent,
-                                const QString& propertyName,
+    explicit ShaderUniformValue(const QString& propertyName,
                                 const QString& identifier,
-                                const QVariant& value);
+                                const QVariant& value,
+                                ShaderNode* parent);
 
 public:
     ShaderNode *m_node;
